@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "flexlayout",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/layoutBox/FlexLayout",
-      "state" : {
-        "revision" : "f3187749d2d31a01aa18f8b107e603e210f9bce9",
-        "version" : "1.3.33"
-      }
-    },
-    {
       "identity" : "kingfisher",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
@@ -79,15 +70,6 @@
       "state" : {
         "revision" : "c7c7d2cf50a3211fe2843f76869c698e4e417930",
         "version" : "6.8.0"
-      }
-    },
-    {
-      "identity" : "swiftlintplugins",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SimplyDanny/SwiftLintPlugins",
-      "state" : {
-        "revision" : "f9731bef175c3eea3a0ca960f1be78fcc2bc7853",
-        "version" : "0.57.1"
       }
     },
     {
