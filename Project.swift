@@ -26,7 +26,15 @@ let project = Project(
             ),
             sources: ["githubClone/Sources/**"],
             resources: ["githubClone/Resources/**"],
-            dependencies: []
+            dependencies: [
+                .external(name: "Kingfisher"),
+                .external(name: "Moya"),
+                .external(name: "RxSwift"),
+                .external(name: "RxDataSources"),
+                .external(name: "FlexLayout"),
+                .external(name: "PinLayout"),
+                .external(name: "ReactorKit")
+            ]
         ),
         .target(
             name: "githubCloneTests",
