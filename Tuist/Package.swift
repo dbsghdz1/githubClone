@@ -12,7 +12,9 @@ let packageSettings = PackageSettings(
         "RxDataSource" : .framework,
         "Moya" : .framework,
         "ReactorKit" : .framework,
-        "Kingfisher" : .framework
+        "Kingfisher" : .framework,
+        "Then" : .framework,
+        "SnapKit" : .framework
     ]
 )
 #endif
@@ -25,7 +27,9 @@ let package = Package(
         .package(url: "https://github.com/RxSwiftCommunity/RxDataSources.git", from: "5.0.0"),
         .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "15.0.0")),
         .package(url: "https://github.com/ReactorKit/ReactorKit.git", .upToNextMajor(from: "3.0.0")),
-        .package(url: "https://github.com/onevcat/Kingfisher", .upToNextMajor(from: "8.1.2"))
+        .package(url: "https://github.com/onevcat/Kingfisher", .upToNextMajor(from: "8.1.2")),
+        .package(url: "https://github.com/devxoul/Then", .upToNextMajor(from: "3.0.0")),
+        .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.1")
     ],
     
     targets: [
@@ -33,11 +37,13 @@ let package = Package(
             name: "githubClone",
             dependencies: [
                 "PinLayout",
+                "Then",
                 "RxSwift",
                 "RxDataSources",
                 "Moya",
                 "ReactorKit",
-                "Kingfisher"
+                "Kingfisher",
+                "SnapKit"
             ]
         )
     ]
