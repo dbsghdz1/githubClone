@@ -16,6 +16,7 @@ import Then
 final class LoginViewController: UIViewController {
     
     private let disposeBag = DisposeBag()
+    private let viewModel = LoginViewModel()
     
     private lazy var loginButton = UIButton().then { button in
         button.tintColor = .black
@@ -39,9 +40,10 @@ final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        bindViewModel()
     }
     
-    func configureUI() {
+    private func configureUI() {
         self.view.backgroundColor = .systemBackground
         
         [
@@ -67,9 +69,15 @@ final class LoginViewController: UIViewController {
             make.centerX.equalTo(loginButton)
         }
     }
-    
-    
+}
 
+private extension LoginViewController {
+    func bindViewModel() {
+        let input = LoginViewModel.Input(loginButtonTapEvent: self.loginButton.rx.tap)
+        
+        self.viewModel.transform(input: input)
+        
+    }
 }
 
 #Preview {
