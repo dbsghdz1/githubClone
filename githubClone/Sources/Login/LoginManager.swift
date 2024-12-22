@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 import RxMoya
 
-class LoginManager {
+final class LoginManager {
     
     static let shared = LoginManager()
     
@@ -43,10 +43,23 @@ class LoginManager {
                 switch result {
                 case .success(let result):
                     print(result)
+                    DispatchQueue.main.async { [weak self] in
+                        let tabBarController = TabBarController()
+                        tabBarController.selectedIndex = 0
+                        self?.navigateToTabBarController(tabBarController: tabBarController)
+                    }
                 case .failure(let error):
                     print(error)
                 }
             }
             .disposed(by: disposeBag)
+    }
+    
+    //TODO: 화면 넘겨주기 처리 고민 해볼것
+    private func navigateToTabBarController(tabBarController: TabBarController) {
+        if let window = UIApplication.shared.windows.first {
+            window.rootViewController = tabBarController
+            window.makeKeyAndVisible()
+        }
     }
 }
