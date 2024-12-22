@@ -11,28 +11,22 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
-final class LoginViewModel: ViewModelType {
+final class LoginViewModel/*: ViewModelType*/ {
     private let disposeBag = DisposeBag()
     
     struct Input {
         let loginButtonTapEvent: ControlEvent<Void>
     }
     
+    //TODO: 화면 넘겨주기 
     struct Output {
-//        let text: Driver<String>
     }
     
-    func transform(input: Input) -> Output {
+    func transform(input: Input) {
             input.loginButtonTapEvent
                 .subscribe(onNext: { _ in
-                    if let url = URL(string: "https://github.com/login/oauth/authorize"), UIApplication.shared.canOpenURL(url) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        print("유효하지 않은 URL")
-                    }
+                    LoginManager.shared.getRequest()
                 })
                 .disposed(by: disposeBag)
-            
-            return Output()
         }
 }
