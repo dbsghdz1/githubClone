@@ -31,9 +31,11 @@ let project = Project(
                 .external(name: "Moya"),
                 .external(name: "RxSwift"),
                 .external(name: "RxDataSources"),
-                .external(name: "FlexLayout"),
+                .external(name: "Then"),
                 .external(name: "PinLayout"),
-                .external(name: "ReactorKit")
+                .external(name: "ReactorKit"),
+                .external(name: "SnapKit"),
+                .external(name: "RxMoya")
             ]
         ),
         .target(
