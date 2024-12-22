@@ -34,7 +34,8 @@ let project = Project(
                 .external(name: "Then"),
                 .external(name: "PinLayout"),
                 .external(name: "ReactorKit"),
-                .external(name: "SnapKit")
+                .external(name: "SnapKit"),
+                .external(name: "RxMoya")
             ]
         ),
         .target(

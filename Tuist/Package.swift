@@ -43,7 +43,8 @@ let package = Package(
                 "Moya",
                 "ReactorKit",
                 "Kingfisher",
-                "SnapKit"
+                "SnapKit",
+                "RxMoya"
             ]
         )
     ]
