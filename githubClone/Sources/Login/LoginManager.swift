@@ -41,12 +41,19 @@ final class LoginManager {
         provider.rx.request(.getAccessToken(code: code))
             .subscribe { result in
                 switch result {
-                case .success(let result):
-                    print(result)
-                    DispatchQueue.main.async { [weak self] in
-                        let tabBarController = TabBarController()
-                        tabBarController.selectedIndex = 0
-                        self?.navigateToTabBarController(tabBarController: tabBarController)
+                case .success(let response):
+                    do {
+                        let decoder = JSONDecoder()
+                        let tokenResponse = try decoder.decode(AccessTokenModel.self, from: response.data)
+                        print("Access Token: \(tokenResponse.accessToken)")
+                        UserDefaults.standard.set(tokenResponse.accessToken, forKey: "accessToken")
+                        DispatchQueue.main.async { [weak self] in
+                            let tabBarController = TabBarController()
+                            tabBarController.selectedIndex = 0
+                            self?.navigateToTabBarController(tabBarController: tabBarController)
+                        }
+                    } catch {
+                        print("JSON 디코딩 오류: \(error.localizedDescription)")
                     }
                 case .failure(let error):
                     print(error)
