@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "kingfisher",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/onevcat/Kingfisher",
-      "state" : {
-        "revision" : "623e1595526a2034dc49eda264a4d174e90dac64",
-        "version" : "8.1.2"
-      }
-    },
-    {
       "identity" : "moya",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Moya/Moya.git",
@@ -28,30 +19,12 @@
       }
     },
     {
-      "identity" : "pinlayout",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/layoutBox/PinLayout",
-      "state" : {
-        "revision" : "8eaa3a15e4dcabaca4c95aea4c0ff0c9b4a67213",
-        "version" : "1.10.5"
-      }
-    },
-    {
       "identity" : "reactiveswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ReactiveCocoa/ReactiveSwift.git",
       "state" : {
         "revision" : "c43bae3dac73fdd3cb906bd5a1914686ca71ed3c",
         "version" : "6.7.0"
-      }
-    },
-    {
-      "identity" : "reactorkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactorKit/ReactorKit.git",
-      "state" : {
-        "revision" : "8fa33f09c6f6621a2aa536d739956d53b84dd139",
-        "version" : "3.2.0"
       }
     },
     {
@@ -88,15 +61,6 @@
       "state" : {
         "revision" : "d41ef523faef0f911369f79c0b96815d9dbb6d7a",
         "version" : "3.0.0"
-      }
-    },
-    {
-      "identity" : "weakmaptable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactorKit/WeakMapTable.git",
-      "state" : {
-        "revision" : "cb05d64cef2bbf51e85c53adee937df46540a74e",
-        "version" : "1.2.1"
       }
     }
   ],

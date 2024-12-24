@@ -11,6 +11,8 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
+                    "CLIENT_ID": "$(CLIENT_ID)",
+                    "CLIENT_ID_SECRET": "$(CLIENT_ID_SECRET)",
                     "UIApplicationSceneManifest": [
                         "UIApplicationSupportsMultipleScenes": false,
                         "UISceneConfigurations": [
@@ -32,10 +34,10 @@ let project = Project(
                 .external(name: "RxSwift"),
                 .external(name: "RxDataSources"),
                 .external(name: "Then"),
-                .external(name: "PinLayout"),
                 .external(name: "ReactorKit"),
                 .external(name: "SnapKit"),
-                .external(name: "RxMoya")
+                .external(name: "RxMoya"),
+                .external(name: "RxCocoa")
             ]
         ),
         .target(
