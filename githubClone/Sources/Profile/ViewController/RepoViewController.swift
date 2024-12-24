@@ -9,28 +9,45 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import SnapKit
 import RxDataSources
 
 final class RepoViewController: UIViewController {
     
+    let disposeBag = DisposeBag()
+    var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
+    
+    var sections = BehaviorRelay(value: [
+        MySection(items: [
+            MySectionData(title: "12", description: "123"),
+            MySectionData(title: "12", description: "123"),
+            MySectionData(title: "12", description: "123"),
+            MySectionData(title: "123232", description: "123")
+        ])
+    ])
+    
     override func viewDidLoad() {
         configureUI()
         bindUI()
+        
+        self.sections
+            .bind(to: repoTableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
     }
     
     private lazy var repoTableView: UITableView = {
         let tableView = UITableView()
         
         tableView.register(RepoTableViewCell.self, forCellReuseIdentifier: String(describing: RepoTableViewCell.self))
-        tableView.backgroundColor = .red
         return tableView
     }()
     
     private func configureUI() {
+        
         view.addSubview(repoTableView)
         
         repoTableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(30)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
@@ -39,17 +56,19 @@ final class RepoViewController: UIViewController {
 extension RepoViewController {
     
     private func bindUI() {
-        let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Int>>(
-            configureCell: { [weak self] dataSource, tableView, indexPath, repo in
-                guard let self else { return UITableViewCell() }
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: RepoTableViewCell.self), for: indexPath) as? RepoTableViewCell else { return UITableViewCell() }
-                cell.configureUI()
-                return cell
-            }
-        )
+        dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
+            dataSource, tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: String(describing: RepoTableViewCell.self),
+                for: indexPath
+            ) as? RepoTableViewCell
+            else { return UITableViewCell() }
+            cell.nameLabel.text = item.title
+            return cell
+        })
     }
 }
 
-#Preview {
-    RepoViewController()
-}
+//#Preview {
+//    RepoViewController()
+//}

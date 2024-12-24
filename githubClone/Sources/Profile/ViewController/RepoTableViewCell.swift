@@ -12,26 +12,30 @@ import Then
 
 final class RepoTableViewCell: UITableViewCell {
     
-    private let nameLabel = UILabel().then { label in
+    let nameLabel = UILabel().then { label in
         label.text = "리포지토리"
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configureUI()
+        setUpUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureUI() {
+    private func setUpUI() {
         contentView.addSubview(nameLabel)
-        contentView.backgroundColor = .black
+        contentView.backgroundColor = .yellow
         
         nameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(30)
             make.centerY.equalToSuperview()
         }
+    }
+    
+    func configureUI(text: String) {
+        nameLabel.text = text
     }
 }
