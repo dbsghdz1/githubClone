@@ -67,7 +67,6 @@ extension RepoViewController {
             .subscribe(onNext: { [weak self] repoModel in
                 guard let self else { return }
                     print("받은 RepoModel: \(repoModel)")
-//                sections = repoModel
                 let newSections = [MySection(items: repoModel)]
                 self.sections.accept(newSections) // `
                 })
