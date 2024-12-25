@@ -16,23 +16,11 @@ final class RepoViewController: UIViewController {
     
     let disposeBag = DisposeBag()
     var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
-    
-    var sections = BehaviorRelay(value: [
-        MySection(items: [
-            MySectionData(title: "12", description: "123"),
-            MySectionData(title: "12", description: "123"),
-            MySectionData(title: "12", description: "123"),
-            MySectionData(title: "123232", description: "123")
-        ])
-    ])
-    
+    let viewModel = RepoViewModel()
+    var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
         bindUI()
-        
-        self.sections
-            .bind(to: repoTableView.rx.items(dataSource: dataSource!))
-            .disposed(by: disposeBag)
     }
     
     private lazy var repoTableView: UITableView = {
@@ -63,9 +51,27 @@ extension RepoViewController {
                 for: indexPath
             ) as? RepoTableViewCell
             else { return UITableViewCell() }
-            cell.nameLabel.text = item.title
+            cell.nameLabel.text = item.name
             return cell
         })
+        
+        self.sections
+            .bind(to: repoTableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
+        
+        let input = RepoViewModel.Input(viewDidLoadEvent: Observable.just(()))
+        let output =  viewModel.transform(input: input)
+        
+        output.repoData
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] repoModel in
+                guard let self else { return }
+                    print("받은 RepoModel: \(repoModel)")
+//                sections = repoModel
+                let newSections = [MySection(items: repoModel)]
+                self.sections.accept(newSections) // `
+                })
+                .disposed(by: disposeBag)
     }
 }
 

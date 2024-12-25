@@ -25,24 +25,11 @@ final class RepoManager {
         
     }
     
-    func readRepo() -> RepoModel {
-        var repo: [RepoModelElement]?
-        provider.rx.request(.readRepo)
-            .subscribe { result in
-                switch result {
-                case .success(let response):
-                    do {
-                        repo = try JSONDecoder().decode(RepoModel.self, from: response.data)
-                        print("repo읽어오기 성공")
-                    } catch {
-                        print("repo JSON 디코딩 실패: \(error)")
-                    }
-                case .failure(let error):
-                    print("repo 읽어오기  응답 실패\(error)")
-                }
-            }
-            .disposed(by: disposeBag)
-        return repo ?? []
+    func readRepo() -> Observable<RepoModel> {
+        return provider.rx.request(.readRepo)
+            .map { response -> RepoModel in
+                return try JSONDecoder().decode(RepoModel.self, from: response.data)
+            }.asObservable()
     }
     
     func updateRepo() {

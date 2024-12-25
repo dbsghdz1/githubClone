@@ -13,14 +13,14 @@ struct MySectionData {
 }
 
 struct MySection: SectionModelType {
-    var items: [MySectionData]
+    var items: [RepoModelElement]
     
 }
 
 extension MySection {
-    typealias Item = MySectionData
+    typealias Item = RepoModelElement
     
-    init(original: MySection, items: [MySectionData]) {
+    init(original: MySection, items: [RepoModelElement]) {
         self = original
         self.items = items
     }
