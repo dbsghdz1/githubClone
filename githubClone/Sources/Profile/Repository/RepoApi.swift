@@ -15,7 +15,7 @@ enum RepoAPI {
     case createRepo
     case readRepo
     case updateRepo
-    case deleteRepo
+    case deleteRepo(owner: String, repo: String)
 }
 
 extension RepoAPI: TargetType {
@@ -26,7 +26,7 @@ extension RepoAPI: TargetType {
         case .createRepo: return "/user/repos"
         case .readRepo: return "/user/repos"
         case .updateRepo: return "/repos"
-        case .deleteRepo: return "/repos/owner/repo"
+        case .deleteRepo(let owner, let repo): return "/repos/\(owner)/\(repo)"
         }
     }
     
