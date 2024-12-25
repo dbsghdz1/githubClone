@@ -41,7 +41,13 @@ extension RepoAPI: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .createRepo: return .requestPlain
+            //TODO: json으로 encoding 하는 방식을 깔끔하게 할 수 없을까??
+        case .createRepo:
+            let parameters: [String: Any] = [
+                "name" : generateRandomName(),
+                "description": "랜덤 이름 레포"
+            ]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .readRepo:
             return .requestPlain
         case .updateRepo: return .requestPlain
@@ -60,5 +66,10 @@ extension RepoAPI: TargetType {
         case .deleteRepo :
             return ["Authorization" : "Bearer \(userBearerToken)"]
         }
+    }
+    
+    func generateRandomName() -> String {
+        let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<8).compactMap { _ in characters.randomElement() })
     }
 }
