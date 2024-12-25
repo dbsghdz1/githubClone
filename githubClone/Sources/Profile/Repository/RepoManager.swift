@@ -44,7 +44,21 @@ final class RepoManager {
         
     }
     
-    func deleteRepo() {
-        
+    func deleteRepo(owner: String, repo: String) {
+        provider.rx.request(.deleteRepo(owner: owner, repo: repo))
+            .subscribe({ result in
+                switch result {
+                case .success(let response):
+                    if let responseString = String(data: response.data, encoding: .utf8) {
+                        print("Response Body: \(responseString)")
+                    } else {
+                        print("No response body")
+                    }
+                    print("Response Headers: \(response.response?.allHeaderFields ?? [:])")
+                case .failure(let error):
+                    print(error)
+                }
+            }).disposed(by: disposeBag)
     }
 }
+

@@ -55,6 +55,12 @@ extension RepoViewController {
             return cell
         })
         
+        self.repoTableView.rx.itemDeleted
+            .subscribe(onNext: { indexPath in
+                let selctedItem = self.sections.value[0].items[indexPath.row]
+                RepoManager.shared.deleteRepo(owner: selctedItem.name, repo: selctedItem.name)
+            }).disposed(by: disposeBag)
+        
         self.sections
             .bind(to: repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
@@ -66,7 +72,7 @@ extension RepoViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] repoModel in
                 guard let self else { return }
-                    print("받은 RepoModel: \(repoModel)")
+//                    print("받은 RepoModel: \(repoModel)")
                 let newSections = [MySection(items: repoModel)]
                 self.sections.accept(newSections) // `
                 })
