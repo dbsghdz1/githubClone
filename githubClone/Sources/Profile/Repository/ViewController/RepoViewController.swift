@@ -25,7 +25,7 @@ final class RepoViewController: UIViewController {
     
     private lazy var repoTableView: UITableView = {
         let tableView = UITableView()
-        
+        tableView.rowHeight = 100
         tableView.register(RepoTableViewCell.self, forCellReuseIdentifier: String(describing: RepoTableViewCell.self))
         return tableView
     }()
@@ -51,7 +51,7 @@ extension RepoViewController {
                 for: indexPath
             ) as? RepoTableViewCell
             else { return UITableViewCell() }
-            cell.nameLabel.text = item.name
+            cell.configureUI(title: item.name, description: item.description ?? "")
             return cell
         })
         

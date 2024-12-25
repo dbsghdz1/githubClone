@@ -11,9 +11,6 @@ import RxSwift
 final class RepoViewModel: ViewModelType {
     
     private let disposeBag = DisposeBag()
-    
-    //TODO: BehaviorRelay랑 PublishRelay 비교 초기 값이 있어야할까..
-//    var repoData = BehaviorRelay<RepoModelElement>(value: [])
 
     struct Input {
         let viewDidLoadEvent: Observable<Void>

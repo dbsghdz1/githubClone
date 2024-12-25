@@ -12,8 +12,12 @@ import Then
 
 final class RepoTableViewCell: UITableViewCell {
     
-    let nameLabel = UILabel().then { label in
+    private let titleLabel = UILabel().then { label in
         label.text = "리포지토리"
+    }
+    
+    private let descriptionLabel = UILabel().then { label in
+        label.text = "리포지토리 설명"
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -26,16 +30,25 @@ final class RepoTableViewCell: UITableViewCell {
     }
     
     private func setUpUI() {
-        contentView.addSubview(nameLabel)
-        contentView.backgroundColor = .yellow
+        [
+            titleLabel,
+            descriptionLabel
+        ].forEach { contentView.addSubview($0) }
+        contentView.backgroundColor = .systemBackground
         
-        nameLabel.snp.makeConstraints { make in
+        titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(30)
             make.centerY.equalToSuperview()
         }
+        
+        descriptionLabel.snp.makeConstraints { make in
+            make.leading.equalTo(titleLabel)
+            make.top.equalTo(titleLabel.snp.bottom).offset(10)
+        }
     }
     
-    func configureUI(text: String) {
-        nameLabel.text = text
+    func configureUI(title: String, description: String) {
+        titleLabel.text = title
+        descriptionLabel.text = description
     }
 }
