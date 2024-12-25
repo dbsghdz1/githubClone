@@ -145,19 +145,19 @@ enum Language: String, Codable {
 
 // MARK: - Owner
 struct Owner: Codable {
-    let login: Login
+    let login: String
     let id: Int
-    let nodeID: NodeID
+    let nodeID: String
     let avatarURL: String
     let gravatarID: String
     let url, htmlURL, followersURL: String
-    let followingURL: FollowingURL
-    let gistsURL: GistsURL
-    let starredURL: StarredURL
+    let followingURL: String
+    let gistsURL: String
+    let starredURL: String
     let subscriptionsURL, organizationsURL, reposURL: String
-    let eventsURL: EventsURL
+    let eventsURL: String
     let receivedEventsURL: String
-    let type: TypeEnum
+    let type: String
     let userViewType: Visibility
     let siteAdmin: Bool
 
@@ -181,40 +181,6 @@ struct Owner: Codable {
         case userViewType = "user_view_type"
         case siteAdmin = "site_admin"
     }
-}
-
-enum EventsURL: String, Codable {
-    case httpsAPIGithubCOMUsersDbsghdz1EventsPrivacy = "https://api.github.com/users/dbsghdz1/events{/privacy}"
-    case httpsAPIGithubCOMUsersDongHyeonDevEventsPrivacy = "https://api.github.com/users/DongHyeonDev/events{/privacy}"
-}
-
-enum FollowingURL: String, Codable {
-    case httpsAPIGithubCOMUsersDbsghdz1FollowingOtherUser = "https://api.github.com/users/dbsghdz1/following{/other_user}"
-    case httpsAPIGithubCOMUsersDongHyeonDevFollowingOtherUser = "https://api.github.com/users/DongHyeonDev/following{/other_user}"
-}
-
-enum GistsURL: String, Codable {
-    case httpsAPIGithubCOMUsersDbsghdz1GistsGistID = "https://api.github.com/users/dbsghdz1/gists{/gist_id}"
-    case httpsAPIGithubCOMUsersDongHyeonDevGistsGistID = "https://api.github.com/users/DongHyeonDev/gists{/gist_id}"
-}
-
-enum Login: String, Codable {
-    case dbsghdz1 = "dbsghdz1"
-    case dongHyeonDev = "DongHyeonDev"
-}
-
-enum NodeID: String, Codable {
-    case mdq6VXNlcjIzMzAyMDU3 = "MDQ6VXNlcjIzMzAyMDU3"
-    case uKgDOBTFXTA = "U_kgDOBtFXTA"
-}
-
-enum StarredURL: String, Codable {
-    case httpsAPIGithubCOMUsersDbsghdz1StarredOwnerRepo = "https://api.github.com/users/dbsghdz1/starred{/owner}{/repo}"
-    case httpsAPIGithubCOMUsersDongHyeonDevStarredOwnerRepo = "https://api.github.com/users/DongHyeonDev/starred{/owner}{/repo}"
-}
-
-enum TypeEnum: String, Codable {
-    case user = "User"
 }
 
 enum Visibility: String, Codable {
