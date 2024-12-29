@@ -9,7 +9,6 @@ import UIKit
 
 import RxCocoa
 import RxSwift
-import Kingfisher
 import SnapKit
 import Then
 

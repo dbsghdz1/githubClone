@@ -1,7 +1,15 @@
 import ProjectDescription
 
+let settings = Settings.settings(
+    configurations: [
+        .debug(name: "Debug", xcconfig: "githubClone/Config.xcconfig")
+    ]
+)
+
+
 let project = Project(
     name: "githubClone",
+    settings: settings,
     targets: [
         .target(
             name: "githubClone",
@@ -11,7 +19,10 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "CFBundleURLTypes": [
-                        "CFBundleURLSchemes": ["githubClone"]
+                        [
+                            "CFBundleURLName": "URL Types",
+                            "CFBundleURLSchemes": ["githubClone"]
+                        ]
                     ],
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
                     "CLIENT_ID": "$(CLIENT_ID)",
@@ -36,10 +47,9 @@ let project = Project(
                 .external(name: "RxSwift"),
                 .external(name: "RxDataSources"),
                 .external(name: "Then"),
-                .external(name: "ReactorKit"),
                 .external(name: "SnapKit"),
                 .external(name: "RxMoya"),
-                .external(name: "RxCocoa")
+                .external(name: "RxCocoa"),
             ]
         ),
         .target(
