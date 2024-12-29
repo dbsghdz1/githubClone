@@ -6,13 +6,9 @@ import ProjectDescription
 
 let packageSettings = PackageSettings(
     productTypes: [
-        "PinLayout" : .framework,
-        "SwiftLint" : .framework,
         "RxSwift" : .framework,
         "RxDataSource" : .framework,
         "Moya" : .framework,
-        "ReactorKit" : .framework,
-        "Kingfisher" : .framework,
         "Then" : .framework,
         "SnapKit" : .framework,
         "RxCocoa" : .framework,
@@ -31,22 +27,4 @@ let package = Package(
         .package(url: "https://github.com/devxoul/Then", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/SnapKit/SnapKit", from: "5.7.1")
     ]
-    
-//    targets: [
-//        .target(
-//            name: "githubClone",
-//            dependencies: [
-//                "PinLayout",
-//                "Then",
-//                "RxSwift",
-//                .product(name: "RxCocoa", package: "RxSwift"),
-//                "RxDataSources",
-//                "Moya",
-//                "ReactorKit",
-//                "Kingfisher",
-//                "SnapKit",
-//                "RxMoya"
-//            ]
-//        )
-//    ]
 )

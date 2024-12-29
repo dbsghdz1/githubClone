@@ -10,6 +10,9 @@ let project = Project(
             bundleId: "io.tuist.githubClone",
             infoPlist: .extendingDefault(
                 with: [
+                    "CFBundleURLTypes": [
+                        "CFBundleURLSchemes": ["githubClone"]
+                    ],
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
                     "CLIENT_ID": "$(CLIENT_ID)",
                     "CLIENT_ID_SECRET": "$(CLIENT_ID_SECRET)",
@@ -29,7 +32,6 @@ let project = Project(
             sources: ["githubClone/Sources/**"],
             resources: ["githubClone/Resources/**"],
             dependencies: [
-                .external(name: "Kingfisher"),
                 .external(name: "Moya"),
                 .external(name: "RxSwift"),
                 .external(name: "RxDataSources"),
