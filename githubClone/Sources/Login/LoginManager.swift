@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 import RxMoya
 
-class LoginManager {
+final class LoginManager {
     
     static let shared = LoginManager()
     
@@ -21,32 +21,31 @@ class LoginManager {
     private let provider = MoyaProvider<UserAPI>()
     private let disposeBag = DisposeBag()
     
-    func getRequest() {
-        provider.rx.request(.login)
-            .subscribe { result in
-                switch result {
-                case .success(let result):
-                    if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                        print("로그인 버튼 응답성공: \(result)")
-                    }
-                case .failure(let error):
-                    print("로그인 응답 실패 \(error)")
+    func getRequest() -> Observable<Void> {
+        return provider.rx.request(.login)
+            .map { _ in
+                if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
                 }
             }
-            .disposed(by: disposeBag)
+            .asObservable()
     }
     
-    func getAccessToken(code: String) {
+    func getAccessToken(code: String) -> Observable<Bool> {
         provider.rx.request(.getAccessToken(code: code))
-            .subscribe { result in
-                switch result {
-                case .success(let result):
-                    print(result)
-                case .failure(let error):
-                    print(error)
+            .map { response in
+                let decoder = JSONDecoder()
+                do {
+                    let tokenResponse = try decoder.decode(AccessTokenModel.self, from: response.data)
+                    UserDefaults.standard.set(tokenResponse.accessToken, forKey: "accessToken")
+                    print("Access Token: \(tokenResponse.accessToken)")
+                    return true
+                } catch {
+                    print("Access Token 디코딩 오류: \(error.localizedDescription)")
+                    return false
                 }
+                
             }
-            .disposed(by: disposeBag)
+            .asObservable()
     }
 }

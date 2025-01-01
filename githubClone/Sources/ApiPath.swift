@@ -16,7 +16,7 @@ enum ApiPath {
     var path: String {
         switch self {
         case .login:
-            return "/login/oauth/authorize?client_id=\(ApiPath.clientId)&scope=repo,user"
+            return "/login/oauth/authorize?client_id=\(ApiPath.clientId)&scope=repo,user,delete_repo"
         case .accessToken:
             return "/login/oauth/access_token"
         case .user:

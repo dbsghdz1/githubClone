@@ -9,7 +9,7 @@ import UIKit
 
 import RxCocoa
 import RxSwift
-import Kingfisher
+import RxRelay
 import SnapKit
 import Then
 
@@ -23,18 +23,18 @@ final class LoginViewController: UIViewController {
         button.layer.cornerRadius = 30
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.systemBackground.cgColor
-        button.setTitle("Github.com에 로그인", for: .normal)
+        button.setTitle(loginMessage.loginButton.rawValue, for: .normal)
         button.backgroundColor = .black
     }
     
     private lazy var loginDescription = UILabel().then { label in
-        label.text = "계정을 사용하여 GitHub.com에 로그인"
+        label.text = loginMessage.loginDescription.rawValue
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 14)
     }
     
     private lazy var gitHubLogoImage = UIImageView().then { imageView in
-        imageView.image = UIImage(named: "github-mark")
+        imageView.image = .githubMark
     }
     
     override func viewDidLoad() {
@@ -44,13 +44,13 @@ final class LoginViewController: UIViewController {
     }
     
     private func configureUI() {
-        self.view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemBackground
         
         [
-            self.gitHubLogoImage,
-            self.loginButton,
-            self.loginDescription
-        ].forEach { self.view.addSubview($0) }
+            gitHubLogoImage,
+            loginButton,
+            loginDescription
+        ].forEach { view.addSubview($0) }
         
         gitHubLogoImage.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(200)
@@ -72,14 +72,44 @@ final class LoginViewController: UIViewController {
 }
 
 private extension LoginViewController {
-    func bindViewModel() {
-        let input = LoginViewModel.Input(loginButtonTapEvent: self.loginButton.rx.tap)
+    
+    private func bindViewModel() {
+        let githubCodeObservable = SceneDelegate.githubCodeRelay.asObservable()
         
-        self.viewModel.transform(input: input)
+        let input = LoginViewModel.Input(
+            loginButtonTapEvent: loginButton.rx.tap,
+            githubCode: githubCodeObservable
+        )
         
+        let output = self.viewModel.transform(input: input)
+        
+        output.loginResult
+            .drive(onNext: { successLogin in
+                if successLogin {
+                    self.navigateToTabBarController()
+                } else {
+                    print("login실패")
+                }
+            }).disposed(by: disposeBag)
+        
+        output.accessToken
+            .subscribe(onNext: {
+                print("로긴 버튼눌림")
+            }).disposed(by: disposeBag)
+        
+    }
+    
+    private func navigateToTabBarController() {
+        let tabBarController = TabBarController()
+        if let sceneDelegate = UIApplication.shared.connectedScenes
+            .compactMap({ $0.delegate as? SceneDelegate }).first,
+           let window = sceneDelegate.window {
+            window.rootViewController = tabBarController
+            window.makeKeyAndVisible()
+        }
     }
 }
 
-#Preview {
-    LoginViewController()
-}
+//#Preview {
+//    LoginViewController()
+//}

@@ -11,22 +11,32 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
-final class LoginViewModel/*: ViewModelType*/ {
-    private let disposeBag = DisposeBag()
+final class LoginViewModel: ViewModelType {
+    var disposeBag = DisposeBag()
     
     struct Input {
         let loginButtonTapEvent: ControlEvent<Void>
+        let githubCode: Observable<String>
     }
     
-    //TODO: 화면 넘겨주기 
     struct Output {
+        let accessToken: Observable<Void>
+        let loginResult: Driver<Bool>
     }
     
-    func transform(input: Input) {
-            input.loginButtonTapEvent
-                .subscribe(onNext: { _ in
-                    LoginManager.shared.getRequest()
-                })
-                .disposed(by: disposeBag)
-        }
+    func transform(input: Input) -> Output {
+        
+        let loginRequest = input.loginButtonTapEvent
+            .flatMap {
+                LoginManager.shared.getRequest()
+            }
+        
+        let loginResult = input.githubCode
+            .flatMap { code in
+                LoginManager.shared.getAccessToken(code: code)
+            }
+            .asDriver(onErrorJustReturn: false)
+        
+        return Output(accessToken: loginRequest, loginResult: loginResult)
+    }
 }

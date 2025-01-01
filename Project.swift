@@ -1,7 +1,15 @@
 import ProjectDescription
 
+let settings = Settings.settings(
+    configurations: [
+        .debug(name: "Debug", xcconfig: "githubClone/Config.xcconfig")
+    ]
+)
+
+
 let project = Project(
     name: "githubClone",
+    settings: settings,
     targets: [
         .target(
             name: "githubClone",
@@ -10,7 +18,15 @@ let project = Project(
             bundleId: "io.tuist.githubClone",
             infoPlist: .extendingDefault(
                 with: [
+                    "CFBundleURLTypes": [
+                        [
+                            "CFBundleURLName": "URL Types",
+                            "CFBundleURLSchemes": ["githubClone"]
+                        ]
+                    ],
                     "UILaunchStoryboardName": "LaunchScreen.storyboard",
+                    "CLIENT_ID": "$(CLIENT_ID)",
+                    "CLIENT_ID_SECRET": "$(CLIENT_ID_SECRET)",
                     "UIApplicationSceneManifest": [
                         "UIApplicationSupportsMultipleScenes": false,
                         "UISceneConfigurations": [
@@ -27,15 +43,13 @@ let project = Project(
             sources: ["githubClone/Sources/**"],
             resources: ["githubClone/Resources/**"],
             dependencies: [
-                .external(name: "Kingfisher"),
                 .external(name: "Moya"),
                 .external(name: "RxSwift"),
                 .external(name: "RxDataSources"),
                 .external(name: "Then"),
-                .external(name: "PinLayout"),
-                .external(name: "ReactorKit"),
                 .external(name: "SnapKit"),
-                .external(name: "RxMoya")
+                .external(name: "RxMoya"),
+                .external(name: "RxCocoa"),
             ]
         ),
         .target(
