@@ -1,8 +1,11 @@
 import UIKit
 
+import RxRelay
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
+    static let githubCodeRelay = PublishRelay<String>()
     
     func scene(
         _ scene: UIScene,
@@ -27,12 +30,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
             if url.absoluteString.starts(with: "githubclone://") {
-                if let code = url.absoluteString.split(separator: "=").last.map({
+                if let githubCode = url.absoluteString.split(separator: "=").last.map({
                     String($0)
                 }) {
-                    LoginManager.shared.getAccessToken(code: code)
+                    SceneDelegate.githubCodeRelay.accept(githubCode)
                 }
             }
         }
     }
 }
+
+
