@@ -48,9 +48,9 @@ extension TabBarController {
             case .home:
                 return CreateRepoVC()
             case .noti:
-                return RepoViewController()
+                return ViewController()
             case .search:
-                return RepoViewController()
+                return ViewController()
             case .profile:
                 return RepoViewController()
             }
