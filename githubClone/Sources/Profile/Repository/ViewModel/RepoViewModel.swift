@@ -10,8 +10,8 @@ import RxSwift
 
 final class RepoViewModel: ViewModelType {
     
-    private let disposeBag = DisposeBag()
-
+    var disposeBag = DisposeBag()
+    
     struct Input {
         let viewDidLoadEvent: Observable<Void>
     }

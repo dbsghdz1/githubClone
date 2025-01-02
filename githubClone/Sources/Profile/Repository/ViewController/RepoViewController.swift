@@ -55,8 +55,10 @@ extension RepoViewController {
             return cell
         })
         
-        self.repoTableView.rx.itemDeleted
-            .subscribe(onNext: { indexPath in
+        //TODO: itemDelete action input에 추가하기 
+        repoTableView.rx.itemDeleted
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self else { return }
                 let selctedItem = self.sections.value[0].items[indexPath.row]
                 RepoManager.shared.deleteRepo(owner: selctedItem.name, repo: selctedItem.name)
             }).disposed(by: disposeBag)

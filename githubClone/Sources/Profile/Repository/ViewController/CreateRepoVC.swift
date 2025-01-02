@@ -14,11 +14,12 @@ import Then
 
 final class CreateRepoVC: UIViewController {
     
-    private let disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
+    private let viewModel = CreateRepoViewModel()
     
-    private lazy var button = UIButton().then { button in
+    private let button = UIButton().then { button in
         button.setTitle("레포만들기", for: .normal)
-        button.backgroundColor = .green
+        button.backgroundColor = .black
         
     }
     override func viewDidLoad() {
@@ -41,9 +42,14 @@ final class CreateRepoVC: UIViewController {
 extension CreateRepoVC {
     
     private func bindUI() {
-        button.rx.tap
-            .subscribe(onNext: {
-                RepoManager.shared.createRepo()
+        let input = CreateRepoViewModel.Input(createRepo: button.rx.tap)
+        
+        let output = viewModel.transform(input: input)
+        
+        //TODO: 레포 생성 후 레포 읽어 오기 일단 response Print
+        output.createResponse
+            .subscribe(onNext: { response in
+                print(response)
             }).disposed(by: disposeBag)
     }
 }
