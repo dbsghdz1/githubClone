@@ -46,7 +46,7 @@ extension CreateRepoVC {
         
         let output = viewModel.transform(input: input)
         
-        //TODO: 레포 생성 후 레포 읽어 오기?
+        //TODO: 레포 생성 후 레포 읽어 오기 일단 response Print
         output.createResponse
             .subscribe(onNext: { response in
                 print(response)
