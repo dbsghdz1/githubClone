@@ -14,7 +14,12 @@ let packageSettings = PackageSettings(
         "RxCocoa" : .framework,
         "RxCocoaRuntime" : .framework,
         "RxRelay" : .framework
-    ]
+    ],
+    baseSettings: .settings(
+        configurations: [
+            .debug(name: .debug),
+            .release(name: .release),
+        ])
 )
 #endif
 
