@@ -10,21 +10,20 @@ import RxSwift
 
 final class RepoViewModel: ViewModelType {
     
-    var disposeBag = DisposeBag()
-    
     struct Input {
         let viewDidLoadEvent: Observable<Void>
     }
     
     struct Output {
-        let repoData: Observable<RepoModel>
+        let repoData: Driver<[RepoModelElement]>
     }
     
     func transform(input: Input) -> Output {
-        input.viewDidLoadEvent
-            .subscribe(onNext: { _ in
-            }).disposed(by: disposeBag)
-        return Output(repoData: RepoManager.shared.readRepo())
+        let repoData = input.viewDidLoadEvent
+            .flatMap { _ -> Observable<RepoModel> in
+                return RepoManager.shared.readRepo()
+            }
+            .asDriver(onErrorJustReturn: [])
+        return Output(repoData: repoData)
     }
-    
 }

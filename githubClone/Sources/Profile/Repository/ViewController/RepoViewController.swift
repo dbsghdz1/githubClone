@@ -70,18 +70,13 @@ extension RepoViewController {
         let input = RepoViewModel.Input(viewDidLoadEvent: Observable.just(()))
         let output =  viewModel.transform(input: input)
         
+        //TODO: READ drive로 변경하기
         output.repoData
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] repoModel in
+            .drive(onNext: { [weak self] repoModel in
                 guard let self else { return }
-//                    print("받은 RepoModel: \(repoModel)")
                 let newSections = [MySection(items: repoModel)]
-                self.sections.accept(newSections) // `
-                })
-                .disposed(by: disposeBag)
+                self.sections.accept(newSections)
+            })
+            .disposed(by: disposeBag)
     }
 }
-
-//#Preview {
-//    RepoViewController()
-//}
