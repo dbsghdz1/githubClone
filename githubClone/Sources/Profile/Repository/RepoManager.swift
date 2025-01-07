@@ -21,8 +21,8 @@ final class RepoManager {
     private let provider = MoyaProvider<RepoAPI>()
     private var disposeBag = DisposeBag()
     
-    func createRepo() -> Observable<RepoModelElement> {
-        return provider.rx.request(.createRepo)
+    func createRepo(repoName: String) -> Observable<RepoModelElement> {
+        return provider.rx.request(.createRepo(name: repoName))
             .map(RepoModelElement.self)
             .asObservable()
     }
