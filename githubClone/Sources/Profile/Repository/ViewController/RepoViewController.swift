@@ -11,28 +11,32 @@ import RxCocoa
 import RxSwift
 import SnapKit
 import RxDataSources
+import Then
 
 final class RepoViewController: UIViewController {
     
-    let disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
     var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
-    let viewModel = RepoViewModel()
+    private let viewModel = RepoViewModel()
     var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
         bindUI()
     }
     
-    private lazy var repoTableView: UITableView = {
-        let tableView = UITableView()
+    private let repoTableView = UITableView().then { tableView in
         tableView.rowHeight = 100
         tableView.register(RepoTableViewCell.self, forCellReuseIdentifier: String(describing: RepoTableViewCell.self))
-        return tableView
-    }()
+    }
+    
+    private let repoPlusButton = UIBarButtonItem().then { button in
+        button.image = UIImage(systemName: "plus")
+    }
     
     private func configureUI() {
         
         view.addSubview(repoTableView)
+        navigationItem.rightBarButtonItem = repoPlusButton
         
         repoTableView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
@@ -41,9 +45,9 @@ final class RepoViewController: UIViewController {
     
 }
 
-extension RepoViewController {
+private extension RepoViewController {
     
-    private func bindUI() {
+    func bindUI() {
         dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
             dataSource, tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
@@ -55,19 +59,41 @@ extension RepoViewController {
             return cell
         })
         
-        //TODO: itemDelete action input에 추가하기 
-        repoTableView.rx.itemDeleted
+        repoPlusButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                let modal = RepoModalVC()
+                let naviModal = UINavigationController(rootViewController: modal)
+                self.present(naviModal, animated: true)
+            }).disposed(by: disposeBag)
+        
+        repoTableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
                 guard let self else { return }
-                let selctedItem = self.sections.value[0].items[indexPath.row]
-                RepoManager.shared.deleteRepo(owner: selctedItem.name, repo: selctedItem.name)
+                let currentSections = self.sections.value
+                self.navigationController?.pushViewController(UpdateRepoVC(repoModelElement: currentSections[0].items[indexPath.row]), animated: true)
             }).disposed(by: disposeBag)
         
         self.sections
             .bind(to: repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
-        let input = RepoViewModel.Input(viewDidLoadEvent: Observable.just(()))
+        let deleteTapEvent = repoTableView.rx.itemDeleted
+            .map { [weak self] indexPath -> String in
+                guard let self else { return "" }
+                var currentSections = self.sections.value
+                let deletedItemName = currentSections[0].items[indexPath.row].name
+                currentSections[0].items.remove(at: indexPath.row)
+                self.sections.accept(currentSections)
+                
+                return deletedItemName
+            }
+            .filter { !$0.isEmpty }
+        
+        let input = RepoViewModel.Input(
+            viewDidLoadEvent: Observable.just(()),
+            deleteTapEvent: deleteTapEvent
+        )
         let output =  viewModel.transform(input: input)
         
         //TODO: READ drive로 변경하기
@@ -78,5 +104,20 @@ extension RepoViewController {
                 self.sections.accept(newSections)
             })
             .disposed(by: disposeBag)
+        
+        //TODO: 삭제잘되었다고 알럿 띄워주기
+        output.deleteData
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                self.deleteAlert(title: "삭제", message: "삭제 잘되었습니다.")
+            }).disposed(by: disposeBag)
+    }
+    
+    func deleteAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let confirmClicked = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(confirmClicked)
+        self.present(alert, animated: true)
     }
 }
+
