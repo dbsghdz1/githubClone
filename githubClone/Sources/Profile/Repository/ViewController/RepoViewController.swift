@@ -13,7 +13,11 @@ import SnapKit
 import RxDataSources
 import Then
 
-final class RepoViewController: UIViewController {
+protocol SendDataDelegate {
+    func recieveData(response: String, repoName: String)
+}
+
+final class RepoViewController: UIViewController, SendDataDelegate {
     
     private var disposeBag = DisposeBag()
     var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
@@ -22,6 +26,16 @@ final class RepoViewController: UIViewController {
     override func viewDidLoad() {
         configureUI()
         bindUI()
+    }
+    
+    func recieveData(response: String, repoName: String) {
+        var currentSections = self.sections.value
+        for (index, item) in currentSections[0].items.enumerated() {
+            if item.name == repoName {
+                currentSections[0].items[index].description = response
+            }
+        }
+        self.sections.accept(currentSections)
     }
     
     private let repoTableView = UITableView().then { tableView in
@@ -71,7 +85,9 @@ private extension RepoViewController {
             .subscribe(onNext: { [weak self] indexPath in
                 guard let self else { return }
                 let currentSections = self.sections.value
-                self.navigationController?.pushViewController(UpdateRepoVC(repoModelElement: currentSections[0].items[indexPath.row]), animated: true)
+                let updateVC = UpdateRepoVC(repoModelElement: currentSections[0].items[indexPath.row])
+                updateVC.dataDelegate = self
+                self.navigationController?.pushViewController(updateVC, animated: true)
             }).disposed(by: disposeBag)
         
         self.sections
