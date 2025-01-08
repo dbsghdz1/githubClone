@@ -21,9 +21,9 @@ protocol SendDataDelegate {
 final class RepoViewController: UIViewController, SendDataDelegate {
     
     private var disposeBag = DisposeBag()
-    var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
+    private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
-    var sections = BehaviorRelay<[MySection]>(value: [])
+    private var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
         bindUI()
@@ -63,7 +63,6 @@ final class RepoViewController: UIViewController, SendDataDelegate {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
-    
 }
 
 private extension RepoViewController {

@@ -12,11 +12,10 @@ import RxRelay
 import RxCocoa
 
 final class LoginViewModel: ViewModelType {
-    var disposeBag = DisposeBag()
+    let githubCodeObservable = SceneDelegate.githubCodeRelay.asObservable()
     
     struct Input {
         let loginButtonTapEvent: ControlEvent<Void>
-        let githubCode: Observable<String>
     }
     
     struct Output {
@@ -31,7 +30,7 @@ final class LoginViewModel: ViewModelType {
                 LoginManager.shared.getRequest()
             }
         
-        let loginResult = input.githubCode
+        let loginResult = githubCodeObservable
             .flatMap { code in
                 LoginManager.shared.getAccessToken(code: code)
             }

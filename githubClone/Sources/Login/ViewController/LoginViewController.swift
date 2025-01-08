@@ -74,11 +74,9 @@ final class LoginViewController: UIViewController {
 private extension LoginViewController {
     
     private func bindViewModel() {
-        let githubCodeObservable = SceneDelegate.githubCodeRelay.asObservable()
         
         let input = LoginViewModel.Input(
-            loginButtonTapEvent: loginButton.rx.tap,
-            githubCode: githubCodeObservable
+            loginButtonTapEvent: loginButton.rx.tap
         )
         
         let output = self.viewModel.transform(input: input)
