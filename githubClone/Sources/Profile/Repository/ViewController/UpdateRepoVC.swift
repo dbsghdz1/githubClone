@@ -51,11 +51,12 @@ final class UpdateRepoVC: UIViewController {
         repoDescirption.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(30)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(50)
+            make.height.equalTo(300)
         }
         
         editButton.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(repoDescirption)
-            make.top.equalTo(repoDescirption).offset(50)
+            make.top.equalTo(repoDescirption.snp.bottom).offset(50)
             make.bottom.equalToSuperview()
         }
     }
@@ -67,7 +68,8 @@ private extension UpdateRepoVC {
         
         let input = UpdateRepoViewModel.Input(
             repoDescription: repoDescirption.rx.text.orEmpty.asObservable(),
-            createButton: editButton.rx.tap
+            createButton: editButton.rx.tap,
+            repoName: Observable.just(repoModelElement.name)
         )
         
         let output = viewModel.transform(input: input)
@@ -75,7 +77,6 @@ private extension UpdateRepoVC {
         output.updatedData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                
                 self.dataDelegate?.recieveData(response: repoDescirption.text ?? "", repoName: repoModelElement.name)
                 self.navigationController?.popViewController(animated: true)
             }).disposed(by: disposeBag)

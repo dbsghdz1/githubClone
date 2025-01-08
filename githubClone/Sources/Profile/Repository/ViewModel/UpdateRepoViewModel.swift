@@ -13,6 +13,7 @@ final class UpdateRepoViewModel: ViewModelType {
     struct Input {
         let repoDescription: Observable<String>
         let createButton: ControlEvent<Void>
+        let repoName: Observable<String>
     }
     
     struct Output {
@@ -21,10 +22,15 @@ final class UpdateRepoViewModel: ViewModelType {
     
     func transform(input: Input) -> Output {
         
-        let updateData = input.createButton
-            .withLatestFrom(input.repoDescription)
-            .flatMap { description in
-                RepoManager.shared.updateRepo(owner: "HF-man", repo: "HF-man", description: description)
+        //TODO: 아 왜 두번씩 실행될까
+        let updateData = Observable
+            .combineLatest(
+                input.createButton,
+                input.repoDescription,
+                input.repoName
+            )
+            .flatMap { _, description, name in
+                RepoManager.shared.updateRepo(owner: "HF-man", repo: name, description: description)
             }
             .asDriver(onErrorJustReturn:())
         
