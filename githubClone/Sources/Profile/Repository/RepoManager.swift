@@ -19,41 +19,31 @@ final class RepoManager {
     private init() {}
     
     private let provider = MoyaProvider<RepoAPI>()
-    private let disposeBag = DisposeBag()
     
-    func createRepo() -> Observable<RepoModelElement> {
-        return provider.rx.request(.createRepo)
-            .map { response -> RepoModelElement in
-                return try JSONDecoder().decode(RepoModelElement.self, from: response.data)
-            }.asObservable()
+    func createRepo(repoName: String) -> Observable<RepoModelElement> {
+        return provider.rx.request(.createRepo(name: repoName))
+            .map(RepoModelElement.self)
+            .asObservable()
     }
     
     func readRepo() -> Observable<RepoModel> {
         return provider.rx.request(.readRepo)
-            .map { response -> RepoModel in
-                return try JSONDecoder().decode(RepoModel.self, from: response.data)
-            }.asObservable()
+            .map(RepoModel.self)
+            .asObservable()
     }
     
-    func updateRepo() {
-        
+    func updateRepo(owner: String, repo: String, description: String) -> Observable<Void> {
+        return provider.rx.request(.updateRepo(owner: owner, repo: repo, description: description))
+            .map { response -> () in
+                print(response)
+            }
+            .asObservable()
     }
     
-    func deleteRepo(owner: String, repo: String) {
-        provider.rx.request(.deleteRepo(owner: owner, repo: repo))
-            .subscribe({ result in
-                switch result {
-                case .success(let response):
-                    if let responseString = String(data: response.data, encoding: .utf8) {
-                        print("Response Body: \(responseString)")
-                    } else {
-                        print("No response body")
-                    }
-                    print("Response Headers: \(response.response?.allHeaderFields ?? [:])")
-                case .failure(let error):
-                    print(error)
-                }
-            }).disposed(by: disposeBag)
+    func deleteRepo(owner: String, repo: String) -> Observable<Void> {
+        return provider.rx.request(.deleteRepo(owner: owner, repo: repo))
+            .map { response -> () in }
+            .asObservable()
     }
 }
 

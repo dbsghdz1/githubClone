@@ -9,25 +9,36 @@ import RxSwift
 import RxCocoa
 
 final class CreateRepoViewModel: ViewModelType {
-    
-    var disposeBag = DisposeBag()
+    private let alertResult = PublishSubject<Bool>()
     
     struct Input {
-        let createRepo: ControlEvent<Void>
+        let createButtonTapped: ControlEvent<Void>
+        let repoName: Observable<String>
     }
     
     struct Output {
+        let showAlert: Observable<Void>
         let createResponse: Observable<RepoModelElement>
     }
     
-    
     func transform(input: Input) -> Output {
-        let createResponse = input.createRepo
-            .flatMap {
-                RepoManager.shared.createRepo()
+        let showAlert = input.createButtonTapped
+            .asObservable()
+        
+        let createResponse = alertResult
+            .filter { $0 }
+            .withLatestFrom(input.repoName)
+            .flatMap { repoName in
+                RepoManager.shared.createRepo(repoName: repoName)
             }
-        return Output(createResponse: createResponse)
+        
+        return Output(
+            showAlert: showAlert,
+            createResponse: createResponse
+        )
     }
     
-    
+    func streamAlert(result: Bool) {
+        alertResult.onNext(result)
+    }
 }
