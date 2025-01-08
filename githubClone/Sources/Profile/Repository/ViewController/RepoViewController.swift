@@ -15,6 +15,7 @@ import Then
 
 protocol SendDataDelegate {
     func recieveData(response: String, repoName: String)
+    func createRepoData(response: RepoModelElement)
 }
 
 final class RepoViewController: UIViewController, SendDataDelegate {
@@ -26,6 +27,12 @@ final class RepoViewController: UIViewController, SendDataDelegate {
     override func viewDidLoad() {
         configureUI()
         bindUI()
+    }
+    
+    func createRepoData(response: RepoModelElement) {
+        var currentSections = self.sections.value
+        currentSections[0].items.append(response)
+        self.sections.accept(currentSections)
     }
     
     func recieveData(response: String, repoName: String) {
@@ -77,6 +84,7 @@ private extension RepoViewController {
             .subscribe(onNext: { [weak self] in
                 guard let self else { return }
                 let modal = RepoModalVC()
+                modal.dataDelegate = self
                 let naviModal = UINavigationController(rootViewController: modal)
                 self.present(naviModal, animated: true)
             }).disposed(by: disposeBag)
