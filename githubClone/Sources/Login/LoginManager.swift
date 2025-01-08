@@ -22,7 +22,8 @@ final class LoginManager {
     private let disposeBag = DisposeBag()
     
     func getRequest() -> Observable<Void> {
-        return provider.rx.request(.login)
+        provider.rx.request(.login)
+        //operartor변경 아래도 마찬가지임 ?? request가 Single<Response> 타입??
             .map { _ in
                 if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
