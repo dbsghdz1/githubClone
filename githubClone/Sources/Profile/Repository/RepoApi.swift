@@ -14,7 +14,7 @@ let userBearerToken = UserDefaults.standard.string(forKey: "accessToken") ?? ""
 enum RepoAPI {
     case createRepo(name: String)
     case readRepo
-    case updateRepo
+    case updateRepo(owner: String, repo: String, description: String)
     case deleteRepo(owner: String, repo: String)
 }
 
@@ -25,7 +25,7 @@ extension RepoAPI: TargetType {
         switch self {
             case .createRepo: return "/user/repos"
             case .readRepo: return "/user/repos"
-            case .updateRepo: return "/repos"
+            case .updateRepo(let owner, let repo, _): return "/repos/\(owner)/\(repo)"
             case .deleteRepo(let owner, let repo): return "/repos/\(owner)/\(repo)"
         }
     }
@@ -49,7 +49,11 @@ extension RepoAPI: TargetType {
                 return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
             case .readRepo:
                 return .requestPlain
-            case .updateRepo: return .requestPlain
+            case .updateRepo(_, _, let description):
+                let parameters: [String: Any] = [
+                    "description" : description
+                ]
+                return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
             case .deleteRepo: return .requestPlain
         }
     }

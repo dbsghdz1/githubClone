@@ -32,8 +32,12 @@ final class RepoManager {
             .asObservable()
     }
     
-    func updateRepo() {
-        
+    func updateRepo(owner: String, repo: String, description: String) -> Observable<Void> {
+        return provider.rx.request(.updateRepo(owner: owner, repo: repo, description: description))
+            .map { response -> () in
+                print(response)
+            }
+            .asObservable()
     }
     
     func deleteRepo(owner: String, repo: String) -> Observable<Void> {
