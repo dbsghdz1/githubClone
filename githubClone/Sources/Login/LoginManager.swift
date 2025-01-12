@@ -19,34 +19,30 @@ final class LoginManager {
     private init() {}
     
     private let provider = MoyaProvider<UserAPI>()
-    private let disposeBag = DisposeBag()
     
-    func getRequest() -> Observable<Void> {
-        provider.rx.request(.login)
+    func getRequest() -> Single<Void> {
         //operartor변경 아래도 마찬가지임 ?? request가 Single<Response> 타입??
-            .map { _ in
-                if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+        return Single.create { single in
+            if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                single(.success(()))
+            } else {
+                single(.failure(LoginError.invalidURL))
             }
-            .asObservable()
+            return Disposables.create()
+        }
     }
     
     func getAccessToken(code: String) -> Observable<Bool> {
         provider.rx.request(.getAccessToken(code: code))
-            .map { response in
-                let decoder = JSONDecoder()
-                do {
-                    let tokenResponse = try decoder.decode(AccessTokenModel.self, from: response.data)
-                    UserDefaults.standard.set(tokenResponse.accessToken, forKey: "accessToken")
-                    print("Access Token: \(tokenResponse.accessToken)")
-                    return true
-                } catch {
-                    print("Access Token 디코딩 오류: \(error.localizedDescription)")
-                    return false
-                }
-                
-            }
+            .map(AccessTokenModel.self)
+            .do(onSuccess: { model in
+                UserDefaults.standard.set(model.accessToken, forKey: "accessToken")
+            }, onError: { error in
+                print(error.localizedDescription)
+            })
+            .map { _ in true }
+            .catchAndReturn(false)
             .asObservable()
     }
 }
