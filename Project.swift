@@ -1,20 +1,5 @@
 import ProjectDescription
 
-public enum ProjectDeployTarget: String {
-    case dev = "DEV"
-    case qa = "QA"
-}
-
-public extension ConfigurationName {
-    static var dev: ConfigurationName { configuration(ProjectDeployTarget.dev.rawValue) }
-    static var qa: ConfigurationName { configuration(ProjectDeployTarget.qa.rawValue) }
-}
-
-enum xcconfigFileRoot: Path {
-    case debug = "githubClone/Config.xcconfig"
-    case release = "githubClone/Config.release.xcconfig"
-}
-
 let commonDependencies: [TargetDependency] = [
     .external(name: "Moya"),
     .external(name: "RxSwift"),
@@ -47,10 +32,7 @@ let appInfoPlist: [String : Plist.Value] = [
         ]
     ]
 ]
-
-let project = Project(
-    name: "githubClone",
-    targets: [
+let targets: [Target] = [
         .target(
             name: "githubClone",
             destinations: .iOS,
@@ -59,26 +41,7 @@ let project = Project(
             infoPlist: .extendingDefault(with: appInfoPlist),
             sources: ["githubClone/Sources/**"],
             resources: ["githubClone/Resources/**"],
-            dependencies: commonDependencies,
-            settings: Settings.settings(
-                configurations: [
-                    .debug(name: .debug, xcconfig: xcconfigFileRoot.debug.rawValue)
-            ])
-        ),
-        .target(
-            name: "release-gitHub",
-            destinations: .iOS,
-            product: .app,
-            bundleId: "io.tuist.githubClone-release",
-            infoPlist: .extendingDefault(with: appInfoPlist),
-            sources: ["githubClone/Sources/**"],
-            resources: ["githubClone/Resources/**"],
-            dependencies: commonDependencies,
-            settings: Settings.settings(
-                configurations: [
-                    .release(name: .release, xcconfig: xcconfigFileRoot.release.rawValue)
-                ]
-            )
+            dependencies: commonDependencies
         ),
         .target(
             name: "githubCloneTests",
@@ -91,4 +54,88 @@ let project = Project(
             dependencies: [.target(name: "githubClone")]
         ),
     ]
-)
+
+let project = Project.makeApp(name: "githubClone", target: targets)
+
+extension Project {
+    public static func makeApp(name: String, target: [Target]) -> Project {
+        return Project(
+            name: name,
+            settings: .settings(
+                configurations: [
+                    .build(.dev, name: name),
+                    .build(.prd, name: name)
+                ]
+            ),
+            targets: target,
+            schemes: [
+                .makeScheme(.dev, name: name),
+                .makeScheme(.prd, name: name)
+            ],
+            additionalFiles: [
+                "../XCConfig/shared.xcconfig"
+            ]
+        )
+    }
+}
+
+extension Configuration {
+    public static func build(_ type: BuildTarget, name: String = "") -> Self {
+        let buildName = type.rawValue
+        switch type {
+        case .dev:
+            return .debug(
+                name: BuildTarget.dev.configurationName,
+                xcconfig: .relativeToXCConfig(type: .dev)
+            )
+        case .prd:
+            return .release(
+                name: BuildTarget.prd.configurationName,
+                xcconfig: .relativeToXCConfig(type: .prd)
+            
+            )
+        }
+    }
+}
+
+extension Scheme {
+    
+    public static func makeScheme(_ type: BuildTarget, name: String) -> Self {
+        let buildName = type.rawValue
+        switch type {
+            case .dev:
+                return .scheme(
+                    name: "\(name)-\(buildName.uppercased())",
+                    buildAction: .buildAction(targets: ["\(name)"]),
+                    runAction: .runAction(configuration: type.configurationName),
+                    archiveAction: .archiveAction(configuration: type.configurationName),
+                    profileAction: .profileAction(configuration: type.configurationName),
+                    analyzeAction: .analyzeAction(configuration: type.configurationName)
+                )
+            case .prd:
+                return .scheme(
+                    name: "\(name)-\(buildName.uppercased())",
+                    buildAction: .buildAction(targets: ["\(name)"]),
+                    runAction: .runAction(configuration: type.configurationName),
+                    archiveAction: .archiveAction(configuration: type.configurationName),
+                    profileAction: .profileAction(configuration: type.configurationName),
+                    analyzeAction: .analyzeAction(configuration: type.configurationName)
+                )
+        }
+    }
+}
+
+public enum BuildTarget: String {
+    case dev = "DEV"
+    case prd = "PRD"
+    
+    public var configurationName: ConfigurationName {
+        return ConfigurationName.configuration(self.rawValue)
+    }
+}
+
+extension Path {
+    public static func relativeToXCConfig(type: BuildTarget) -> Self {
+        return .relativeToRoot("./githubClone/XCConfig/XCConfig.\(type.rawValue.lowercased()).xcconfig")
+    }
+}
