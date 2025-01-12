@@ -15,10 +15,11 @@ import Then
 
 final class LoginViewController: UIViewController {
     
-    private let disposeBag = DisposeBag()
+    //ViewModel을 optional로 선언을 하면?
+    private var disposeBag = DisposeBag()
     private let viewModel = LoginViewModel()
     
-    private lazy var loginButton = UIButton().then { button in
+    private let loginButton = UIButton().then { button in
         button.tintColor = .black
         button.layer.cornerRadius = 30
         button.layer.borderWidth = 1
@@ -27,13 +28,13 @@ final class LoginViewController: UIViewController {
         button.backgroundColor = .black
     }
     
-    private lazy var loginDescription = UILabel().then { label in
+    private let loginDescription = UILabel().then { label in
         label.text = loginMessage.loginDescription.rawValue
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 14)
     }
     
-    private lazy var gitHubLogoImage = UIImageView().then { imageView in
+    private let gitHubLogoImage = UIImageView().then { imageView in
         imageView.image = .githubMark
     }
     
