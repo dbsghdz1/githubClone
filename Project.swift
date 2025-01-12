@@ -73,13 +73,13 @@ extension Project {
                 .makeScheme(.prd, name: name)
             ],
             additionalFiles: [
-                "../XCConfig/shared.xcconfig"
+                "./githubClone/XCConfig/XCConfig.shared.xcconfig"
             ]
         )
     }
 }
 
-extension Configuration {
+extension ProjectDescription.Configuration {
     public static func build(_ type: BuildTarget, name: String = "") -> Self {
         let buildName = type.rawValue
         switch type {
@@ -126,8 +126,8 @@ extension Scheme {
 }
 
 public enum BuildTarget: String {
-    case dev = "DEV"
-    case prd = "PRD"
+    case dev = "debug"
+    case prd = "release"
     
     public var configurationName: ConfigurationName {
         return ConfigurationName.configuration(self.rawValue)
