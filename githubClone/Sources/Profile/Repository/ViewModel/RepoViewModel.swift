@@ -13,13 +13,15 @@ import RxRelay
 
 final class RepoViewModel: ViewModelType {
     
+    private var sections = BehaviorRelay<[MySection]>(value: [])
+    
     struct Input {
         let viewDidLoadEvent: Observable<Void>
-        let deleteTapEvent: Observable<String>
+        let deleteTapEvent: ControlEvent<IndexPath>
     }
     
     struct Output {
-        let repoData: Driver<[RepoModelElement]>
+        let repoData: Driver<[MySection]>
         let deleteData: Driver<Void>
     }
     
@@ -27,13 +29,21 @@ final class RepoViewModel: ViewModelType {
         
         let repoData = input.viewDidLoadEvent
             .flatMap { _ -> Observable<RepoModel> in
-                return RepoManager.shared.readRepo()
+                RepoManager.shared.readRepo()
             }
-            .asDriver(onErrorJustReturn: [])
+            .flatMap { [weak self] data -> Driver<[MySection]> in
+                guard let self else { return Driver.just([MySection]()) }
+                let newSections = [MySection(items: data)]
+                self.sections.accept(newSections)
+                return self.sections.asDriver(onErrorJustReturn: [MySection]())
+            }
+            .asDriver(onErrorJustReturn: [MySection]())
         
         let deleRepoData = input.deleteTapEvent
-            .flatMap { repoName -> Observable<Void> in
-                RepoManager.shared.deleteRepo(owner: "HF-man", repo: repoName)
+            .flatMap { [weak self] indexPath -> Observable<Void> in
+                guard let self else { return Observable.just(()) }
+                let item = self.sections.value[indexPath.section].items[indexPath.row]
+                return RepoManager.shared.deleteRepo(owner: item.owner.login, repo: item.name)
             }
             .asDriver(onErrorJustReturn: ())
         return Output(repoData: repoData, deleteData: deleRepoData)

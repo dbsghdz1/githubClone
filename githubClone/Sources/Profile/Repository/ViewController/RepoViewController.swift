@@ -23,9 +23,11 @@ final class RepoViewController: UIViewController, SendDataDelegate {
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
+    //viewController 에 데이터 없이 section -> ViewModel
     private var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
+        bindDataSource()
         bindUI()
     }
     
@@ -65,22 +67,32 @@ final class RepoViewController: UIViewController, SendDataDelegate {
     }
 }
 
-private extension RepoViewController {
+extension RepoViewController {
     
-    func bindUI() {
-        dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
+    private func bindDataSource() {
+        let dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
             dataSource, tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: String(describing: RepoTableViewCell.self),
                 for: indexPath
             ) as? RepoTableViewCell
             else { return UITableViewCell() }
+            //구조 체 만들기
             cell.configureUI(title: item.name, description: item.description ?? "")
             return cell
         })
+        self.dataSource = dataSource
+    }
+    
+    private func bindViewModel() {
         
-        repoPlusButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+    }
+    
+    private func bindUI() {
+        
+        //input, output 지키기 buttonTap input으로 옮기기
+        repoPlusButton.rx.tap.asDriver()
+            .drive(onNext: { [weak self] in
                 guard let self else { return }
                 let modal = RepoModalVC()
                 modal.dataDelegate = self
@@ -88,6 +100,7 @@ private extension RepoViewController {
                 self.present(naviModal, animated: true)
             }).disposed(by: disposeBag)
         
+        //위와 같음
         repoTableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
                 guard let self else { return }
@@ -97,50 +110,25 @@ private extension RepoViewController {
                 self.navigationController?.pushViewController(updateVC, animated: true)
             }).disposed(by: disposeBag)
         
-        self.sections
-            .bind(to: repoTableView.rx.items(dataSource: dataSource!))
-            .disposed(by: disposeBag)
-        
-        let deleteTapEvent = repoTableView.rx.itemDeleted
-            .map { [weak self] indexPath -> String in
-                guard let self else { return "" }
-                var currentSections = self.sections.value
-                let deletedItemName = currentSections[0].items[indexPath.row].name
-                currentSections[0].items.remove(at: indexPath.row)
-                self.sections.accept(currentSections)
-                
-                return deletedItemName
-            }
-            .filter { !$0.isEmpty }
-        
         let input = RepoViewModel.Input(
             viewDidLoadEvent: Observable.just(()),
-            deleteTapEvent: deleteTapEvent
+            deleteTapEvent: repoTableView.rx.itemDeleted.asControlEvent()
         )
         let output =  viewModel.transform(input: input)
         
-        //TODO: READ drive로 변경하기
+        //TODO: tableViewData ViewModel에서 다루기 - 완
         output.repoData
-            .drive(onNext: { [weak self] repoModel in
-                guard let self else { return }
-                let newSections = [MySection(items: repoModel)]
-                self.sections.accept(newSections)
-            })
+            .drive(repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
-        
-        //TODO: 삭제잘되었다고 알럿 띄워주기
+
+        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기
         output.deleteData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                self.deleteAlert(title: "삭제", message: "삭제 잘되었습니다.")
+//                self.deleteAlert(title: "삭제", message: "삭제 잘되었습니다.")
+                let alertMessage = AlertMessage(title: "title", message: "message", yesButtonTitle: "네", cancelButtonTitle: "아니오", defaultButtonTitle: nil)
+                showAlert(alertModel: alertMessage, Action: nil)
             }).disposed(by: disposeBag)
-    }
-    
-    func deleteAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmClicked = UIAlertAction(title: "확인", style: .default)
-        alert.addAction(confirmClicked)
-        self.present(alert, animated: true)
     }
 }
 
