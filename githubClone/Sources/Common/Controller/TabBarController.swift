@@ -46,7 +46,7 @@ extension TabBarController {
         var viewController: UIViewController {
             switch self {
             case .home:
-                return CreateRepoVC()
+                return ViewController()
             case .noti:
                 return ViewController()
             case .search:
