@@ -84,25 +84,13 @@ extension RepoViewController {
         self.dataSource = dataSource
     }
     
-    private func bindViewModel() {
-        
-    }
-    
     private func bindUI() {
-        //위와 같음
-        repoTableView.rx.itemSelected
-            .subscribe(onNext: { [weak self] indexPath in
-                guard let self else { return }
-                let currentSections = self.sections.value
-                let updateVC = UpdateRepoVC(repoModelElement: currentSections[0].items[indexPath.row])
-                updateVC.dataDelegate = self
-                self.navigationController?.pushViewController(updateVC, animated: true)
-            }).disposed(by: disposeBag)
         
         let input = RepoViewModel.Input(
             viewDidLoadEvent: Observable.just(()),
             deleteTapEvent: repoTableView.rx.itemDeleted.asControlEvent(),
             repoPlusButtonTap: repoPlusButton.rx.tap.asControlEvent(),
+            repoTableCellTap: repoTableView.rx.itemSelected.asControlEvent()
         )
         let output =  viewModel.transform(input: input)
         
@@ -111,14 +99,14 @@ extension RepoViewController {
             .drive(repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
 
-        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기
+        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기 + Alert 수정
         output.deleteData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-//                self.deleteAlert(title: "삭제", message: "삭제 잘되었습니다.")
-                let alertMessage = AlertMessage(title: "title", message: "message", yesButtonTitle: "네", cancelButtonTitle: "아니오", defaultButtonTitle: nil)
+                let alertMessage = AlertMessage(title: "삭제 메시지", message: "잘 삭제 되었습니다.", yesButtonTitle: "네", cancelButtonTitle: nil, defaultButtonTitle: nil)
                 showAlert(alertModel: alertMessage, Action: nil)
             }).disposed(by: disposeBag)
+        
         output.repoPlusButtonTapped
             .drive(onNext: { [weak self] in
                 guard let self else { return }
@@ -128,6 +116,13 @@ extension RepoViewController {
                 self.present(naviModal, animated: true)
             }).disposed(by: disposeBag)
         
+        output.repoTableCellTapped
+            .drive(onNext: { [weak self] repoData in
+                guard let self else { return }
+                let updateVC = UpdateRepoVC(repoModelElement: repoData)
+                updateVC.dataDelegate = self
+                self.navigationController?.pushViewController(updateVC, animated: true)
+            }).disposed(by: disposeBag)
     }
 }
 

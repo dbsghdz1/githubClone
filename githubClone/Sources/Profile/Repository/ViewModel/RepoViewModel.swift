@@ -19,12 +19,14 @@ final class RepoViewModel: ViewModelType {
         let viewDidLoadEvent: Observable<Void>
         let deleteTapEvent: ControlEvent<IndexPath>
         let repoPlusButtonTap: ControlEvent<Void>
+        let repoTableCellTap: ControlEvent<IndexPath>
     }
     
     struct Output {
         let repoData: Driver<[MySection]>
         let deleteData: Driver<Void>
         let repoPlusButtonTapped: Driver<Void>
+        let repoTableCellTapped: Driver<RepoModelElement>
     }
     
     func transform(input: Input) -> Output {
@@ -51,5 +53,21 @@ final class RepoViewModel: ViewModelType {
         
         let repoPlusButtonTapped = input.repoPlusButtonTap.asDriver()
         
+        let repoTableCellTapped = input.repoTableCellTap
+            .flatMap { [weak self] indexPath -> Observable<RepoModelElement> in
+                guard let self else { return Observable.empty() }
+                let item = self.sections.value[indexPath.section].items[indexPath.row]
+                return Observable.just(item)
+            }
+            .asDriver { error in
+                return Driver.empty()
+            }
+            
+        return Output(
+            repoData: repoData,
+            deleteData: deleRepoData,
+            repoPlusButtonTapped: repoPlusButtonTapped,
+            repoTableCellTapped: repoTableCellTapped
+        )
     }
 }
