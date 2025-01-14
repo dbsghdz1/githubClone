@@ -14,13 +14,12 @@ import SnapKit
 
 final class UpdateRepoVC: UIViewController {
     
-    private let viewModel = UpdateRepoViewModel()
+    private let viewModel: UpdateRepoViewModel
     private var disposeBag = DisposeBag()
-    private var repoModelElement: RepoModelElement
     private let repoDescirption = UITextField()
     
-    init(repoModelElement: RepoModelElement) {
-        self.repoModelElement = repoModelElement
+    init(viewModel: UpdateRepoViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,10 +30,6 @@ final class UpdateRepoVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
-        navigationItem.title = repoModelElement.fullName
-         
-        configureUI()
         bindUI()
     }
     
@@ -43,9 +38,10 @@ final class UpdateRepoVC: UIViewController {
         button.setTitleColor(.black, for: .normal)
     }
 
-    private func configureUI() {
+    private func configureUI(updateModel: UpdateRepoModel) {
         [repoDescirption, editButton].forEach { view.addSubview($0) }
-        repoDescirption.placeholder = repoModelElement.description ?? ""
+        repoDescirption.placeholder =  updateModel.placeHolder
+        navigationItem.title = updateModel.naviTitle
         
         repoDescirption.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(30)
@@ -61,17 +57,27 @@ final class UpdateRepoVC: UIViewController {
     }
 }
 
-private extension UpdateRepoVC {
+extension UpdateRepoVC {
     
-    func bindUI() {
+    private func bindUI() {
         
         let input = UpdateRepoViewModel.Input(
+            viewDidLoadEvent: Observable.just(()),
             repoDescription: repoDescirption.rx.text.orEmpty.asObservable(),
-            createButton: editButton.rx.tap,
-            repoName: Observable.just(repoModelElement.name)
+            editButton: editButton.rx.tap
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.viewDidLoad
+            .drive(onNext: { [weak self] repoData in
+                guard let self else { return }
+                let updateModel = UpdateRepoModel(
+                    naviTitle: repoData.name,
+                    placeHolder: repoData.description
+                )
+                self.configureUI(updateModel: updateModel)
+            }).disposed(by: disposeBag)
         
         output.updatedData
             .drive(onNext: { [weak self] in

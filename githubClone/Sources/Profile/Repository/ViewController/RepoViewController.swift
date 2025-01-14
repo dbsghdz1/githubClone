@@ -19,7 +19,7 @@ final class RepoViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
-    //viewController 에 데이터 없이 section -> ViewModel 삭제 해야함
+
     override func viewDidLoad() {
         configureUI()
         bindDataSource()
@@ -55,7 +55,7 @@ extension RepoViewController {
                 withIdentifier: String(describing: RepoTableViewCell.self),
                 for: indexPath
             ) as? RepoTableViewCell else { return UITableViewCell() }
-            //TODO: 구조 체 만들기
+
             let repoTableModel = RepoTableModel(
                 repoName: item.name,
                 repoDescription: item.description
@@ -70,9 +70,9 @@ extension RepoViewController {
         
         let input = RepoViewModel.Input(
             viewDidLoadEvent: Observable.just(()),
-            deleteTapEvent: repoTableView.rx.itemDeleted.asControlEvent(),
-            repoPlusButtonTap: repoPlusButton.rx.tap.asControlEvent(),
-            repoTableCellTap: repoTableView.rx.itemSelected.asControlEvent()
+            deleteTapEvent: repoTableView.rx.itemDeleted,
+            repoPlusButtonTap: repoPlusButton.rx.tap,
+            repoTableCellTap: repoTableView.rx.itemSelected
         )
         let output =  viewModel.transform(input: input)
         
@@ -81,7 +81,6 @@ extension RepoViewController {
             .drive(repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
 
-        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기 + Alert 수정, enum화
         output.deleteData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
@@ -106,7 +105,8 @@ extension RepoViewController {
         output.repoTableCellTapped
             .drive(onNext: { [weak self] repoData in
                 guard let self else { return }
-                let updateVC = UpdateRepoVC(repoModelElement: repoData)
+                let updateViewModel = UpdateRepoViewModel(repoData: BehaviorRelay(value: repoData))
+                let updateVC = UpdateRepoVC(viewModel: updateViewModel)
                 self.navigationController?.pushViewController(updateVC, animated: true)
             }).disposed(by: disposeBag)
     }
