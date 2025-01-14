@@ -18,6 +18,7 @@ protocol SendDataDelegate {
     func createRepoData(response: RepoModelElement)
 }
 
+//TODO: BaseVC 활용하기
 final class RepoViewController: UIViewController, SendDataDelegate {
     
     private var disposeBag = DisposeBag()
@@ -77,8 +78,9 @@ extension RepoViewController {
                 for: indexPath
             ) as? RepoTableViewCell
             else { return UITableViewCell() }
-            //구조 체 만들기
-            cell.configureUI(title: item.name, description: item.description ?? "")
+            //TODO: 구조 체 만들기
+            let repoTableModel = RepoTableModel(repoName: item.name, repoDescription: item.description)
+            cell.configureUI(repoTableModel: repoTableModel)
             return cell
         })
         self.dataSource = dataSource
@@ -94,19 +96,26 @@ extension RepoViewController {
         )
         let output =  viewModel.transform(input: input)
         
-        //TODO: tableViewData ViewModel에서 다루기 - 완
+        //TODO: dataSource 저거 ! 처리고민해보쟈
         output.repoData
             .drive(repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
 
-        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기 + Alert 수정
+        //TODO: 삭제시, 업데이트시 indexPath를 보내주고 viewModel에서 가공 후 View로 뿌려주기 + Alert 수정, enum화
         output.deleteData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                let alertMessage = AlertMessage(title: "삭제 메시지", message: "잘 삭제 되었습니다.", yesButtonTitle: "네", cancelButtonTitle: nil, defaultButtonTitle: nil)
+                let alertMessage = AlertMessageModel(
+                    title: AlertMessage.deleteTitle.rawValue,
+                    message: AlertMessage.deleteMessage.rawValue,
+                    yesButtonTitle: AlertMessage.deleteOk.rawValue,
+                    cancelButtonTitle: nil,
+                    defaultButtonTitle: nil
+                )
                 showAlert(alertModel: alertMessage, Action: nil)
             }).disposed(by: disposeBag)
         
+        //고민: 모달띄우기, 네비전환 깔끔하게 처리할수 있을까? showAlert처럼 Ex활용해볼까/
         output.repoPlusButtonTapped
             .drive(onNext: { [weak self] in
                 guard let self else { return }

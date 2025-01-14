@@ -47,8 +47,8 @@ final class RepoTableViewCell: UITableViewCell {
         }
     }
     
-    func configureUI(title: String, description: String) {
-        titleLabel.text = title
-        descriptionLabel.text = description
+    func configureUI(repoTableModel: RepoTableModel) {
+        titleLabel.text = repoTableModel.repoName
+        descriptionLabel.text = repoTableModel.repoDescription
     }
 }

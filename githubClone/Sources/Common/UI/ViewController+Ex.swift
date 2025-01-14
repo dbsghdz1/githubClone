@@ -9,7 +9,7 @@ import UIKit
 
 extension UIViewController {
     
-    func showAlert(alertModel: AlertMessage, Action: (() -> Void)?) {
+    func showAlert(alertModel: AlertMessageModel, Action: (() -> Void)?) {
         let alert = UIAlertController(title: alertModel.title, message: alertModel.message, preferredStyle: .alert)
         
         let cancel = UIAlertAction(title: alertModel.cancelButtonTitle, style: .destructive)
