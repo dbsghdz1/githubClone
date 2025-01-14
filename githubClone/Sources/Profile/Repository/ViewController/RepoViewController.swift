@@ -23,7 +23,7 @@ final class RepoViewController: UIViewController, SendDataDelegate {
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
-    //viewController 에 데이터 없이 section -> ViewModel
+    //viewController 에 데이터 없이 section -> ViewModel 삭제 해야함
     private var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
@@ -89,17 +89,6 @@ extension RepoViewController {
     }
     
     private func bindUI() {
-        
-        //input, output 지키기 buttonTap input으로 옮기기
-        repoPlusButton.rx.tap.asDriver()
-            .drive(onNext: { [weak self] in
-                guard let self else { return }
-                let modal = RepoModalVC()
-                modal.dataDelegate = self
-                let naviModal = UINavigationController(rootViewController: modal)
-                self.present(naviModal, animated: true)
-            }).disposed(by: disposeBag)
-        
         //위와 같음
         repoTableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
@@ -112,7 +101,8 @@ extension RepoViewController {
         
         let input = RepoViewModel.Input(
             viewDidLoadEvent: Observable.just(()),
-            deleteTapEvent: repoTableView.rx.itemDeleted.asControlEvent()
+            deleteTapEvent: repoTableView.rx.itemDeleted.asControlEvent(),
+            repoPlusButtonTap: repoPlusButton.rx.tap.asControlEvent(),
         )
         let output =  viewModel.transform(input: input)
         
@@ -129,6 +119,15 @@ extension RepoViewController {
                 let alertMessage = AlertMessage(title: "title", message: "message", yesButtonTitle: "네", cancelButtonTitle: "아니오", defaultButtonTitle: nil)
                 showAlert(alertModel: alertMessage, Action: nil)
             }).disposed(by: disposeBag)
+        output.repoPlusButtonTapped
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                let modal = RepoModalVC()
+                modal.dataDelegate = self
+                let naviModal = UINavigationController(rootViewController: modal)
+                self.present(naviModal, animated: true)
+            }).disposed(by: disposeBag)
+        
     }
 }
 

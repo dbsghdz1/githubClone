@@ -18,11 +18,13 @@ final class RepoViewModel: ViewModelType {
     struct Input {
         let viewDidLoadEvent: Observable<Void>
         let deleteTapEvent: ControlEvent<IndexPath>
+        let repoPlusButtonTap: ControlEvent<Void>
     }
     
     struct Output {
         let repoData: Driver<[MySection]>
         let deleteData: Driver<Void>
+        let repoPlusButtonTapped: Driver<Void>
     }
     
     func transform(input: Input) -> Output {
@@ -46,6 +48,8 @@ final class RepoViewModel: ViewModelType {
                 return RepoManager.shared.deleteRepo(owner: item.owner.login, repo: item.name)
             }
             .asDriver(onErrorJustReturn: ())
-        return Output(repoData: repoData, deleteData: deleRepoData)
+        
+        let repoPlusButtonTapped = input.repoPlusButtonTap.asDriver()
+        
     }
 }
