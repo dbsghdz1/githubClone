@@ -13,39 +13,17 @@ import SnapKit
 import RxDataSources
 import Then
 
-protocol SendDataDelegate {
-    func recieveData(response: String, repoName: String)
-    func createRepoData(response: RepoModelElement)
-}
-
 //TODO: BaseVC 활용하기
-final class RepoViewController: UIViewController, SendDataDelegate {
+final class RepoViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
     //viewController 에 데이터 없이 section -> ViewModel 삭제 해야함
-    private var sections = BehaviorRelay<[MySection]>(value: [])
     override func viewDidLoad() {
         configureUI()
         bindDataSource()
         bindUI()
-    }
-    
-    func createRepoData(response: RepoModelElement) {
-        var currentSections = self.sections.value
-        currentSections[0].items.append(response)
-        self.sections.accept(currentSections)
-    }
-    
-    func recieveData(response: String, repoName: String) {
-        var currentSections = self.sections.value
-        for (index, item) in currentSections[0].items.enumerated() {
-            if item.name == repoName {
-                currentSections[0].items[index].description = response
-            }
-        }
-        self.sections.accept(currentSections)
     }
     
     private let repoTableView = UITableView().then { tableView in
@@ -76,10 +54,12 @@ extension RepoViewController {
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: String(describing: RepoTableViewCell.self),
                 for: indexPath
-            ) as? RepoTableViewCell
-            else { return UITableViewCell() }
+            ) as? RepoTableViewCell else { return UITableViewCell() }
             //TODO: 구조 체 만들기
-            let repoTableModel = RepoTableModel(repoName: item.name, repoDescription: item.description)
+            let repoTableModel = RepoTableModel(
+                repoName: item.name,
+                repoDescription: item.description
+            )
             cell.configureUI(repoTableModel: repoTableModel)
             return cell
         })
@@ -119,9 +99,7 @@ extension RepoViewController {
         output.repoPlusButtonTapped
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                let modal = RepoModalVC()
-                modal.dataDelegate = self
-                let naviModal = UINavigationController(rootViewController: modal)
+                let naviModal = UINavigationController(rootViewController: RepoModalVC())
                 self.present(naviModal, animated: true)
             }).disposed(by: disposeBag)
         
@@ -129,7 +107,6 @@ extension RepoViewController {
             .drive(onNext: { [weak self] repoData in
                 guard let self else { return }
                 let updateVC = UpdateRepoVC(repoModelElement: repoData)
-                updateVC.dataDelegate = self
                 self.navigationController?.pushViewController(updateVC, animated: true)
             }).disposed(by: disposeBag)
     }

@@ -18,7 +18,6 @@ final class UpdateRepoVC: UIViewController {
     private var disposeBag = DisposeBag()
     private var repoModelElement: RepoModelElement
     private let repoDescirption = UITextField()
-    var dataDelegate: SendDataDelegate?
     
     init(repoModelElement: RepoModelElement) {
         self.repoModelElement = repoModelElement
@@ -77,7 +76,6 @@ private extension UpdateRepoVC {
         output.updatedData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                self.dataDelegate?.recieveData(response: repoDescirption.text ?? "", repoName: repoModelElement.name)
                 self.navigationController?.popViewController(animated: true)
             }).disposed(by: disposeBag)
     }
