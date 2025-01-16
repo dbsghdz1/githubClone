@@ -16,6 +16,7 @@ final class RepoViewModel: ViewModelType {
     private var sections = BehaviorRelay<[MySection]>(value: [])
     
     struct Input {
+//        let viewWillAppearEvent: BehaviorRelay<Bool>
         let viewDidLoadEvent: Observable<Void>
         let deleteTapEvent: ControlEvent<IndexPath>
         let repoPlusButtonTap: ControlEvent<Void>
@@ -27,6 +28,7 @@ final class RepoViewModel: ViewModelType {
         let deleteData: Driver<Void>
         let repoPlusButtonTapped: Driver<Void>
         let repoTableCellTapped: Driver<RepoModelElement>
+//        let viewWillAppear: Driver<[MySection]>
     }
     
     func transform(input: Input) -> Output {
@@ -39,9 +41,9 @@ final class RepoViewModel: ViewModelType {
                 guard let self else { return Driver.just([MySection]()) }
                 let newSections = [MySection(items: data)]
                 self.sections.accept(newSections)
-                return self.sections.asDriver(onErrorJustReturn: [MySection]())
+                return self.sections.asDriver(onErrorJustReturn: [])
             }
-            .asDriver(onErrorJustReturn: [MySection]())
+            .asDriver(onErrorJustReturn: [])
         
         let deleRepoData = input.deleteTapEvent
             .flatMap { [weak self] indexPath -> Observable<Void> in
@@ -62,12 +64,26 @@ final class RepoViewModel: ViewModelType {
             .asDriver { error in
                 return Driver.empty()
             }
+        
+//        let didPop = input.viewWillAppearEvent
+//            .filter { $0 }
+//            .flatMap { _ -> Observable<RepoModel> in
+//                RepoManager.shared.readRepo()
+//            }
+//            .flatMap { [weak self] data -> Driver<[MySection]> in
+//                guard let self else { return Driver.just([MySection]()) }
+//                let newSections = [MySection(items: data)]
+//                self.sections.accept(newSections)
+//                return self.sections.asDriver(onErrorJustReturn: [])
+//            }
+//            .asDriver(onErrorJustReturn: [])
             
         return Output(
             repoData: repoData,
             deleteData: deleRepoData,
             repoPlusButtonTapped: repoPlusButtonTapped,
             repoTableCellTapped: repoTableCellTapped
+//            viewWillAppear: didPop
         )
     }
 }

@@ -82,6 +82,7 @@ extension UpdateRepoVC {
         output.updatedData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
+                RepoViewController().didPop.accept(true)
                 self.navigationController?.popViewController(animated: true)
             }).disposed(by: disposeBag)
     }

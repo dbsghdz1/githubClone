@@ -19,8 +19,19 @@ final class RepoViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
-
+    let didPop = BehaviorRelay<Bool>(value: false)
+    
+//    init(viewModel: RepoViewModel?) {
+//        self.viewModel = RepoViewModel()
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//    
     override func viewDidLoad() {
+        super.viewDidLoad()
         configureUI()
         bindDataSource()
         bindUI()
@@ -39,6 +50,7 @@ final class RepoViewController: UIViewController {
         
         view.addSubview(repoTableView)
         navigationItem.rightBarButtonItem = repoPlusButton
+        view.backgroundColor = .systemBackground
         
         repoTableView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
@@ -69,6 +81,7 @@ extension RepoViewController {
     private func bindUI() {
         
         let input = RepoViewModel.Input(
+//            viewWillAppearEvent: didPop,
             viewDidLoadEvent: Observable.just(()),
             deleteTapEvent: repoTableView.rx.itemDeleted,
             repoPlusButtonTap: repoPlusButton.rx.tap,
@@ -77,6 +90,11 @@ extension RepoViewController {
         let output =  viewModel.transform(input: input)
         
         //TODO: dataSource 저거 ! 처리고민해보쟈
+        //TODO: 
+//        output.viewWillAppear
+//            .drive(repoTableView.rx.items(dataSource: dataSource!))
+//            .disposed(by: disposeBag)
+        
         output.repoData
             .drive(repoTableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
@@ -111,4 +129,3 @@ extension RepoViewController {
             }).disposed(by: disposeBag)
     }
 }
-
