@@ -21,7 +21,6 @@ final class TabBarController: UITabBarController {
             vc.navigationItem.title = item.navigtaionItemTitle
             vc.navigationItem.largeTitleDisplayMode = .always
             
-            
             let nav = UINavigationController(rootViewController: vc)
             nav.title = item.navigtaionItemTitle
             nav.tabBarItem.image = item.tabbarImage
@@ -45,40 +44,40 @@ extension TabBarController {
         
         var viewController: UIViewController {
             switch self {
-            case .home:
-                return CreateRepoVC()
-            case .noti:
-                return ViewController()
-            case .search:
-                return ViewController()
-            case .profile:
-                return RepoViewController()
+                case .home:
+                    return ViewController()
+                case .noti:
+                    return ViewController()
+                case .search:
+                    return ViewController()
+                case .profile:
+                    return RepoViewController()
             }
         }
         
         var tabbarImage: UIImage? {
             switch self {
-            case .home:
-                return UIImage(systemName: "house.fill")
-            case .noti:
-                return UIImage(systemName: "house.fill")
-            case .search:
-                return UIImage(systemName: "house.fill")
-            case .profile:
-                return UIImage(systemName: "house.fill")
+                case .home:
+                    return UIImage(systemName: "house.fill")
+                case .noti:
+                    return UIImage(systemName: "house.fill")
+                case .search:
+                    return UIImage(systemName: "house.fill")
+                case .profile:
+                    return UIImage(systemName: "house.fill")
             }
         }
         
         var navigtaionItemTitle: String {
             switch self {
-            case .home:
-                return "홈"
-            case .noti:
-                return "알림"
-            case .search:
-                return "탐색"
-            case .profile:
-                return "프로필"
+                case .home:
+                    return "홈"
+                case .noti:
+                    return "알림"
+                case .search:
+                    return "탐색"
+                case .profile:
+                    return "프로필"
             }
         }
     }

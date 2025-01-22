@@ -100,11 +100,11 @@ extension LoginViewController {
     }
     
     private func navigateToTabBarController() {
-        let tabBarController = TabBarController()
+//        let tabBarController = TabBarController()
         if let sceneDelegate = UIApplication.shared.connectedScenes
             .compactMap({ $0.delegate as? SceneDelegate }).first,
            let window = sceneDelegate.window {
-            window.rootViewController = tabBarController
+            window.rootViewController = UINavigationController(rootViewController: RepoViewController())
             window.makeKeyAndVisible()
         }
     }

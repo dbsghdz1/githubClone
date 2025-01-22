@@ -17,7 +17,6 @@ final class RepoModalVC: UIViewController {
     private var disposeBag = DisposeBag()
     private let viewModel = CreateRepoViewModel()
     private let sheet = UIAlertController(title: "경고", message: "정말 휴지통으로 보내겠습니까?", preferredStyle: .alert)
-    var dataDelegate: SendDataDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,7 +79,6 @@ private extension RepoModalVC {
             .subscribe(onNext: { [weak self] response in
                 print(response)
                 guard let self else { return }
-                self.dataDelegate?.createRepoData(response: response)
                 //TODO: Response 보내기
                 self.dismiss(animated: true)
             }).disposed(by: disposeBag)

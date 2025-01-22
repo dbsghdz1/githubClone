@@ -13,36 +13,28 @@ import SnapKit
 import RxDataSources
 import Then
 
-protocol SendDataDelegate {
-    func recieveData(response: String, repoName: String)
-    func createRepoData(response: RepoModelElement)
-}
-
-final class RepoViewController: UIViewController, SendDataDelegate {
+//TODO: BaseVC 활용하기
+final class RepoViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     private var dataSource: RxTableViewSectionedReloadDataSource<MySection>?
     private let viewModel = RepoViewModel()
-    private var sections = BehaviorRelay<[MySection]>(value: [])
+    let didPop = BehaviorRelay<Bool>(value: false)
+    
+//    init(viewModel: RepoViewModel?) {
+//        self.viewModel = RepoViewModel()
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//    
     override func viewDidLoad() {
+        super.viewDidLoad()
         configureUI()
+        bindDataSource()
         bindUI()
-    }
-    
-    func createRepoData(response: RepoModelElement) {
-        var currentSections = self.sections.value
-        currentSections[0].items.append(response)
-        self.sections.accept(currentSections)
-    }
-    
-    func recieveData(response: String, repoName: String) {
-        var currentSections = self.sections.value
-        for (index, item) in currentSections[0].items.enumerated() {
-            if item.name == repoName {
-                currentSections[0].items[index].description = response
-            }
-        }
-        self.sections.accept(currentSections)
     }
     
     private let repoTableView = UITableView().then { tableView in
@@ -58,6 +50,7 @@ final class RepoViewController: UIViewController, SendDataDelegate {
         
         view.addSubview(repoTableView)
         navigationItem.rightBarButtonItem = repoPlusButton
+        view.backgroundColor = .systemBackground
         
         repoTableView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
@@ -65,82 +58,74 @@ final class RepoViewController: UIViewController, SendDataDelegate {
     }
 }
 
-private extension RepoViewController {
+extension RepoViewController {
     
-    func bindUI() {
-        dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
+    private func bindDataSource() {
+        let dataSource = RxTableViewSectionedReloadDataSource<MySection>(configureCell: {
             dataSource, tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: String(describing: RepoTableViewCell.self),
                 for: indexPath
-            ) as? RepoTableViewCell
-            else { return UITableViewCell() }
-            cell.configureUI(title: item.name, description: item.description ?? "")
+            ) as? RepoTableViewCell else { return UITableViewCell() }
+
+            let repoTableModel = RepoTableModel(
+                repoName: item.name,
+                repoDescription: item.description
+            )
+            cell.configureUI(repoTableModel: repoTableModel)
             return cell
         })
-        
-        repoPlusButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self else { return }
-                let modal = RepoModalVC()
-                modal.dataDelegate = self
-                let naviModal = UINavigationController(rootViewController: modal)
-                self.present(naviModal, animated: true)
-            }).disposed(by: disposeBag)
-        
-        repoTableView.rx.itemSelected
-            .subscribe(onNext: { [weak self] indexPath in
-                guard let self else { return }
-                let currentSections = self.sections.value
-                let updateVC = UpdateRepoVC(repoModelElement: currentSections[0].items[indexPath.row])
-                updateVC.dataDelegate = self
-                self.navigationController?.pushViewController(updateVC, animated: true)
-            }).disposed(by: disposeBag)
-        
-        self.sections
-            .bind(to: repoTableView.rx.items(dataSource: dataSource!))
-            .disposed(by: disposeBag)
-        
-        let deleteTapEvent = repoTableView.rx.itemDeleted
-            .map { [weak self] indexPath -> String in
-                guard let self else { return "" }
-                var currentSections = self.sections.value
-                let deletedItemName = currentSections[0].items[indexPath.row].name
-                currentSections[0].items.remove(at: indexPath.row)
-                self.sections.accept(currentSections)
-                
-                return deletedItemName
-            }
-            .filter { !$0.isEmpty }
+        self.dataSource = dataSource
+    }
+    
+    private func bindUI() {
         
         let input = RepoViewModel.Input(
+//            viewWillAppearEvent: didPop,
             viewDidLoadEvent: Observable.just(()),
-            deleteTapEvent: deleteTapEvent
+            deleteTapEvent: repoTableView.rx.itemDeleted,
+            repoPlusButtonTap: repoPlusButton.rx.tap,
+            repoTableCellTap: repoTableView.rx.itemSelected
         )
         let output =  viewModel.transform(input: input)
         
-        //TODO: READ drive로 변경하기
-        output.repoData
-            .drive(onNext: { [weak self] repoModel in
-                guard let self else { return }
-                let newSections = [MySection(items: repoModel)]
-                self.sections.accept(newSections)
-            })
-            .disposed(by: disposeBag)
+        //TODO: dataSource 저거 ! 처리고민해보쟈
+        //TODO: 
+//        output.viewWillAppear
+//            .drive(repoTableView.rx.items(dataSource: dataSource!))
+//            .disposed(by: disposeBag)
         
-        //TODO: 삭제잘되었다고 알럿 띄워주기
+        output.repoData
+            .drive(repoTableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
+
         output.deleteData
             .drive(onNext: { [weak self] in
                 guard let self else { return }
-                self.deleteAlert(title: "삭제", message: "삭제 잘되었습니다.")
+                let alertMessage = AlertMessageModel(
+                    title: AlertMessage.deleteTitle.rawValue,
+                    message: AlertMessage.deleteMessage.rawValue,
+                    yesButtonTitle: AlertMessage.deleteOk.rawValue,
+                    cancelButtonTitle: nil,
+                    defaultButtonTitle: nil
+                )
+                showAlert(alertModel: alertMessage, Action: nil)
+            }).disposed(by: disposeBag)
+        
+        //고민: 모달띄우기, 네비전환 깔끔하게 처리할수 있을까? showAlert처럼 Ex활용해볼까/
+        output.repoPlusButtonTapped
+            .drive(onNext: { [weak self] in
+                guard let self else { return }
+                let naviModal = UINavigationController(rootViewController: RepoModalVC())
+                self.present(naviModal, animated: true)
+            }).disposed(by: disposeBag)
+        
+        output.repoTableCellTapped
+            .drive(onNext: { [weak self] repoData in
+                guard let self else { return }
+                let updateViewModel = UpdateRepoViewModel(repoData: BehaviorRelay(value: repoData))
+                let updateVC = UpdateRepoVC(viewModel: updateViewModel)
+                self.navigationController?.pushViewController(updateVC, animated: true)
             }).disposed(by: disposeBag)
     }
-    
-    func deleteAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmClicked = UIAlertAction(title: "확인", style: .default)
-        alert.addAction(confirmClicked)
-        self.present(alert, animated: true)
-    }
 }
-
