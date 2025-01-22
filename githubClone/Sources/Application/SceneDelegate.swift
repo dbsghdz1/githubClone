@@ -16,8 +16,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         if let _ = UserDefaults.standard.string(forKey: "accessToken") {
-            let tabBarController = TabBarController()
-            window.rootViewController = tabBarController
+//            let tabBarController = TabBarController()
+//            window.rootViewController = tabBarController
+            window.rootViewController = UINavigationController(rootViewController: RepoViewController())
         } else {
             let loginViewController = LoginViewController()
             window.rootViewController = loginViewController
