@@ -17,19 +17,18 @@ let appInfoPlist: [String : Plist.Value] = [
             "CFBundleURLSchemes": ["githubClone"]
         ]
     ],
-    "UILaunchStoryboardName": "LaunchScreen.storyboard",
     "CLIENT_ID": "$(CLIENT_ID)",
     "CLIENT_ID_SECRET": "$(CLIENT_ID_SECRET)",
     "UIApplicationSceneManifest": [
         "UIApplicationSupportsMultipleScenes": false,
-        "UISceneConfigurations": [
-            "UIWindowSceneSessionRoleApplication": [
-                [
-                    "UISceneConfigurationName": "Default Configuration",
-                    "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
-                ],
-            ]
-        ]
+//        "UISceneConfigurations": [
+//            "UIWindowSceneSessionRoleApplication": [
+//                [
+//                    "UISceneConfigurationName": "Default Configuration",
+//                    "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+//                ],
+//            ]
+//        ]
     ]
 ]
 let targets: [Target] = [
