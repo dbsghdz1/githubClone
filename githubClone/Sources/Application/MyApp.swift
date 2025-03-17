@@ -9,11 +9,18 @@ import SwiftUI
 
 @main
 struct MyApp: App {
+  let viewModel = LoginViewM()
   var body: some Scene {
     WindowGroup {
       LoginView()
         .onOpenURL { url in
-          print(url)
+          if url.absoluteString.starts(with: "githubclone://") {
+            if let githubCode = url.absoluteString.split(separator: "=").last.map({
+              String($0)
+            }) {
+              viewModel.getToken(value: githubCode)
+            }
+          }
         }
     }
   }
