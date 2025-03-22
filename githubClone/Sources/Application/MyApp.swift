@@ -9,19 +9,28 @@ import SwiftUI
 
 @main
 struct MyApp: App {
-  let viewModel = LoginViewM()
+  
+  @StateObject private var viewModel = LoginViewM()
+  
+  let accessToken = UserDefaults.standard.string(forKey: "accessToken") ?? ""
   var body: some Scene {
     WindowGroup {
-      LoginView()
-        .onOpenURL { url in
-          if url.absoluteString.starts(with: "githubclone://") {
-            if let githubCode = url.absoluteString.split(separator: "=").last.map({
-              String($0)
-            }) {
-              viewModel.getToken(value: githubCode)
+      if accessToken != "" {
+        RepoView()
+      } else {
+        LoginView(viewModel: viewModel)
+          .onOpenURL { url in
+            if url.absoluteString.starts(with: "githubclone://") {
+              if let githubCode = url.absoluteString.split(separator: "=").last.map({
+                String($0)
+              }) {
+                Task {
+                  await viewModel.getToken(token: githubCode)
+                }
+              }
             }
           }
-        }
+      }
     }
   }
 }
