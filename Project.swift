@@ -11,7 +11,11 @@ let commonDependencies: [TargetDependency] = [
 ]
 
 let appInfoPlist: [String : Plist.Value] = [
-    "CFBundleURLTypes": [
+  "UILaunchScreen": [
+      "UIColorName": "",
+      "UIImageName": "",
+  ],
+  "CFBundleURLTypes": [
         [
             "CFBundleURLName": "URL Types",
             "CFBundleURLSchemes": ["githubClone"]
@@ -19,8 +23,9 @@ let appInfoPlist: [String : Plist.Value] = [
     ],
     "CLIENT_ID": "$(CLIENT_ID)",
     "CLIENT_ID_SECRET": "$(CLIENT_ID_SECRET)",
-    "UIApplicationSceneManifest": [
-        "UIApplicationSupportsMultipleScenes": false,
+
+//    "UIApplicationSceneManifest": [
+//        "UIApplicationSupportsMultipleScenes": false,
 //        "UISceneConfigurations": [
 //            "UIWindowSceneSessionRoleApplication": [
 //                [
@@ -29,7 +34,7 @@ let appInfoPlist: [String : Plist.Value] = [
 //                ],
 //            ]
 //        ]
-    ]
+//    ]
 ]
 let targets: [Target] = [
         .target(
