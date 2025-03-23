@@ -16,7 +16,7 @@ struct MyApp: App {
   var body: some Scene {
     WindowGroup {
       if accessToken != "" {
-        RepoView()
+        ProfileView()
       } else {
         LoginView(viewModel: viewModel)
           .onOpenURL { url in
