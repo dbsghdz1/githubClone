@@ -56,9 +56,26 @@ final class NetworkManager {
     request.setValue("Bearer \(userBearerToken)", forHTTPHeaderField: "Authorization")
     request.setValue("application/json", forHTTPHeaderField: "Content-type")
     request.setValue("application/json", forHTTPHeaderField: "Accept")
-    print(self.userBearerToken)
     let (data, _) = try await URLSession.shared.data(for: request)
     let repoModel = try JSONDecoder().decode([RepoModelElement].self, from: data)
     return repoModel
+  }
+  
+  func getUserInfo() async throws -> User? {
+    var urlComponents = URLComponents()
+    urlComponents.scheme = "https"
+    urlComponents.host = "api.github.com"
+    urlComponents.path = "/user"
+    
+    guard let url = urlComponents.url else { return nil }
+    var request = URLRequest(url: url)
+    request.httpMethod = HttpMethod.GET.rawValue
+    request.setValue("Bearer \(userBearerToken)", forHTTPHeaderField: "Authorization")
+    request.setValue("application/json", forHTTPHeaderField: "Content-type")
+    request.setValue("application/json", forHTTPHeaderField: "Accept")
+    
+    let (data, _) = try await URLSession.shared.data(for: request)
+    let user = try JSONDecoder().decode(User.self, from: data)
+    return user
   }
 }
