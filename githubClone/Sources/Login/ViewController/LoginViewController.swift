@@ -45,7 +45,7 @@ struct LoginView: View {
       }
       .background(Color(uiColor: .systemBackground))
     } else {
-      RepoView()
+      ProfileView()
     }
   }
 }
