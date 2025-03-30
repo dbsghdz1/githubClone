@@ -10,6 +10,10 @@ import SwiftUI
 extension Color {
   static let gitListColor = Color(hex: "#16181B")
   static let gitStatusColor = Color(hex: "#1F2124")
+  static let gitRepoColor = Color(hex: "#41434D")
+  static let gitStartColor = Color(hex: "#F6CD4B")
+  static let gitOrgColor = Color(hex: "#F0914C")
+  static let gitProjectColor = Color(hex: "#9295A0")
 }
 
 extension Color {
