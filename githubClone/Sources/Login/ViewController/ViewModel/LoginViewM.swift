@@ -8,12 +8,9 @@
 import SwiftUI
 import Combine
 
-import Moya
-
-final class LoginViewM: ObservableObject {
+final class LoginViewModel: ObservableObject {
   
   @Published var accessToken = ""
-  private let provider = MoyaProvider<UserAPI>()
   
   func getRequest() {
     if let url = URL(string: UserAPI.login.fullURL), UIApplication.shared.canOpenURL(url) {

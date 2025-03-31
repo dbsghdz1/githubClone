@@ -11,7 +11,7 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
-final class LoginViewModel: ViewModelType {
+final class LoginViewM: ViewModelType {
 //  let githubCodeObservable = SceneDelegate.githubCodeRelay.asObservable()
   let githubCodeObservable = Observable.just("")
   
