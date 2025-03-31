@@ -7,11 +7,12 @@
 
 import UIKit
 import SwiftUI
-import Combine
 //로그인 에러처리 try catch
-struct LoginView: View {
-  
-  @StateObject var viewModel: LoginViewM
+struct LoginView {
+  @StateObject var viewModel: LoginViewModel
+}
+
+extension LoginView: View {
   var body: some View {
     if viewModel.accessToken.isEmpty {
       VStack {
@@ -23,27 +24,27 @@ struct LoginView: View {
         Button {
           viewModel.getRequest()
         } label: {
-          Text("Github.com에 로그인")
+          Text(loginMessage.loginButton.rawValue)
             .frame(maxWidth: .infinity)
-            .frame(height: 60)
+            .frame(height: 64)
             .background(.white)
             .font(.headline)
             .foregroundColor(.black)
-            .cornerRadius(30)
+            .cornerRadius(32)
             .overlay(
-              RoundedRectangle(cornerRadius: 30)
+              RoundedRectangle(cornerRadius: 32)
                 .stroke(Color(uiColor: .systemBackground), lineWidth: 1)
             )
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 32)
         
-        Text("계정을 사용하여 Github.com에 로그인")
+        Text(loginMessage.loginDescription.rawValue)
           .font(.subheadline)
-          .padding(.vertical, 5)
+          .padding(.vertical, 8)
           .foregroundColor(.gray)
         Spacer()
       }
-      .background(Color(uiColor: .systemBackground))
+      .background(Color.black)
     } else {
       ProfileView()
     }
@@ -51,5 +52,5 @@ struct LoginView: View {
 }
 
 #Preview {
-  LoginView(viewModel: LoginViewM())
+  LoginView(viewModel: LoginViewModel())
 }
