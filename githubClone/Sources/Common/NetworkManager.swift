@@ -5,13 +5,9 @@
 //  Created by Yunhong on 3/19/25.
 //
 
-//여기를 어떻게 제네릭하게 사용할 수 있을까 httpMethod를 받아야 할것 같은데 + body와 header, path등...
-//여기를 concurrency? 고민
 import Foundation
 
-import Moya
 final class NetworkManager {
-  private let provider = MoyaProvider<RepoAPI>()
   let userBearerToken = UserDefaults.standard.string(forKey: "accessToken") ?? ""
   
   static let shared = NetworkManager()
@@ -24,7 +20,7 @@ final class NetworkManager {
     urlComponents.path = "/login/oauth/access_token"
     
     var request = URLRequest(url: urlComponents.url!)
-    request.httpMethod = "POST"
+    request.httpMethod = HttpMethod.POST.rawValue
     request.setValue("application/json", forHTTPHeaderField: "Accept")
     request.setValue("application/json", forHTTPHeaderField: "Content-type")
     
@@ -45,14 +41,14 @@ final class NetworkManager {
     return accessToken
   }
   
-  func readRepo() async throws -> [RepoModelElement] {
+  func readRepo(userName: String) async throws -> [RepoModelElement] {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
     urlComponents.host = "api.github.com"
-    urlComponents.path = "/user/repos"
+    urlComponents.path = "/users/userName/repos"
     
     var request = URLRequest(url: urlComponents.url!)
-    request.httpMethod = "GET"
+    request.httpMethod = HttpMethod.GET.rawValue
     request.setValue("Bearer \(userBearerToken)", forHTTPHeaderField: "Authorization")
     request.setValue("application/json", forHTTPHeaderField: "Content-type")
     request.setValue("application/json", forHTTPHeaderField: "Accept")
