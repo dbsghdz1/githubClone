@@ -62,7 +62,7 @@ struct RepoView: View {
     .onAppear {
       Task {
         do {
-          repoData = try await NetworkManager.shared.readRepo()
+          repoData = try await NetworkManager.shared.readRepo(userName: repoData.first?.owner.login ?? "")
         } catch {
           print(error)
         }

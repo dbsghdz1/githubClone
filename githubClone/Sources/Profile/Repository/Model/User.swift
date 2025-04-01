@@ -35,6 +35,25 @@ struct User: Codable {
   let following: Int
   let createdAt: String
   let updatedAt: String
+  let privateGists: Int
+  let totalPrivateRepos: Int
+  let ownedPrivateRepos: Int
+  let diskUsage: Int
+  let collaborators: Int
+  let twoFactorAuthentication: Bool
+  let plan: Plan?
+  
+  struct Plan: Codable {
+    let name: String
+    let space: Int
+    let collaborators: Int
+    let privateRepos: Int
+    
+    enum CodingKeys: String, CodingKey {
+      case name, space, collaborators
+      case privateRepos = "private_repos"
+    }
+  }
   
   enum CodingKeys: String, CodingKey {
     case login, id
@@ -62,6 +81,13 @@ struct User: Codable {
     case followers, following
     case createdAt = "created_at"
     case updatedAt = "updated_at"
+    case privateGists = "private_gists"
+    case totalPrivateRepos = "total_private_repos"
+    case ownedPrivateRepos = "owned_private_repos"
+    case diskUsage = "disk_usage"
+    case collaborators
+    case twoFactorAuthentication = "two_factor_authentication"
+    case plan
   }
 }
 

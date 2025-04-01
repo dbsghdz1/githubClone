@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct MyApp: App {
   
-  @StateObject private var viewModel = LoginViewM()
+  @StateObject private var viewModel = LoginViewModel()
   
   let accessToken = UserDefaults.standard.string(forKey: "accessToken") ?? ""
   var body: some Scene {
