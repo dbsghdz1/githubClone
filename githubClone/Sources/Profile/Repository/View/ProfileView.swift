@@ -7,19 +7,14 @@
 
 import SwiftUI
 
-struct ProfileView: View {
+struct ProfileView {
   @State private var user: User?
-  private let profileList = ["리포지토리", "별표 표시", "조직", "프로젝트"]
-  private let colorList = [
-    Color.gitRepoColor,
-    Color.gitStartColor,
-    Color.gitOrgColor,
-    Color.gitProjectColor
-  ]
-  private let profileIconList = ["book.closed", "star", "building.2", "list.bullet.rectangle"]
   private var gridItems: [GridItem] = [
     GridItem(.flexible())
   ]
+}
+
+extension ProfileView: View {
   var body: some View {
     ScrollView {
       VStack {
@@ -29,17 +24,11 @@ struct ProfileView: View {
             .imageScale(.large)
             .foregroundStyle(.blue)
             .font(.headline)
-            .onTapGesture {
-              print("tapped")
-            }
             .padding(.trailing, 16)
           Image(systemName: "square.and.arrow.up")
             .imageScale(.large)
             .foregroundStyle(.blue)
             .font(.headline)
-            .onTapGesture {
-              print("tapped")
-            }
         }
         .padding(.horizontal)
         HStack {
@@ -61,7 +50,6 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         Button {
-          print("버튼눌림")
         } label: {
           Text(" 🤔")
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -74,7 +62,7 @@ struct ProfileView: View {
                 .stroke(Color(uiColor: .systemBackground), lineWidth: 1)
             )
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal)
         .padding(.vertical, 8)
         HStack {
           Image(systemName: "person.2")
@@ -85,23 +73,21 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 8)
-        .padding(.vertical, 16)
-        .padding(.horizontal, 8)
+        .padding(.vertical)
         VStack(spacing: 0) {
-          ForEach(profileList, id: \.self) { list in
-            let index = profileList.firstIndex(of: list)
+          ForEach(ProfileItem.items, id: \.self) { item in
             HStack {
-              Image(systemName: profileIconList[index ?? 0])
+              Image(systemName: item.iconName)
                 .frame(width: 20, height: 20)
                 .padding(.all, 8)
-                .background(colorList[index ?? 0])
+                .background(item.color)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
-              Text(list)
+              Text(item.title)
                 .padding(.leading, 8)
               Spacer()
             }
             .padding(.all)
-            if index != profileList.count - 1 {
+            if item.title != ProfileItem.items.last?.title {
               Divider()
             }
           }
