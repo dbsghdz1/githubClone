@@ -45,7 +45,7 @@ final class NetworkManager {
     var urlComponents = URLComponents()
     urlComponents.scheme = "https"
     urlComponents.host = "api.github.com"
-    urlComponents.path = "/users/userName/repos"
+    urlComponents.path = "/users/\(userName)/repos"
     
     var request = URLRequest(url: urlComponents.url!)
     request.httpMethod = HttpMethod.GET.rawValue
@@ -63,7 +63,10 @@ final class NetworkManager {
     urlComponents.host = "api.github.com"
     urlComponents.path = "/user"
     
-    guard let url = urlComponents.url else { return nil }
+    guard
+      let url = urlComponents.url
+    else { return nil }
+    
     var request = URLRequest(url: url)
     request.httpMethod = HttpMethod.GET.rawValue
     request.setValue("Bearer \(userBearerToken)", forHTTPHeaderField: "Authorization")
